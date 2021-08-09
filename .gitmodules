@@ -1,0 +1,3 @@
+[submodule "iGibson"]
+	path = iGibson
+	url = https://github.com/StanfordVL/iGibson.git
