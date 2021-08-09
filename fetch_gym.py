@@ -10,14 +10,13 @@ import pybullet_data
 import os
 from typing import List
 
-import gibson2
-from gibson2.robots.fetch_robot import Fetch
-from gibson2.utils.utils import parse_config
-import gibson2.external.pybullet_tools.utils as pb_utils
+import igibson
+from igibson.robots.fetch_robot import Fetch
+from igibson.utils.utils import parse_config
+import igibson.external.pybullet_tools.utils as pb_utils
 
 from fetch_pb_motion_planning import FetchMotionPlanningPyBullet
-from iGibson.gibson2.simulator import Simulator
-
+from igibson.simulator import Simulator
 
 # -------- Constants ---------
 SIMULATION_FREQ = 240
@@ -179,7 +178,7 @@ class FetchRobot():
     Fetch Robot, internally use iGibson's Fetch robot class
     '''
     def __init__(self) -> None:
-        config = parse_config(os.path.join(gibson2.example_config_path, 'fetch_reaching.yaml'))
+        config = parse_config(os.path.join(igibson.example_config_path, 'fetch_reaching.yaml'))
         self.fetch = Fetch(config)
         self.fetch.load()
         self.fetchId = self.fetch.robot_ids[0]

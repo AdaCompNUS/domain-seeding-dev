@@ -1,14 +1,14 @@
-from gibson2.robots.fetch_robot import Fetch
-from gibson2.utils.utils import parse_config
-from gibson2.objects.articulated_object import ArticulatedObject
-from gibson2.external.pybullet_tools.utils import joints_from_names, set_joint_positions, link_from_name
-import gibson2.external.pybullet_tools.utils as pb_utils
+from igibson.robots.fetch_robot import Fetch
+from igibson.utils.utils import parse_config
+from igibson.objects.articulated_object import ArticulatedObject
+from igibson.external.pybullet_tools.utils import joints_from_names, set_joint_positions, link_from_name
+import igibson.external.pybullet_tools.utils as pb_utils
 import os
 import time
 import numpy as np
 import pybullet as p
 import pybullet_data
-import gibson2
+import igibson
 import math
 
 from fetch_pb_motion_planning import FetchMotionPlanningPyBullet
@@ -25,7 +25,7 @@ def main():
     p.loadMJCF(floor)
 
     # Add fetch
-    config = parse_config(os.path.join(gibson2.example_config_path, 'fetch_reaching.yaml'))
+    config = parse_config(os.path.join(igibson.example_config_path, 'fetch_reaching.yaml'))
     fetch = Fetch(config)
     fetch.load()
     fetchId = fetch.robot_ids[0]
