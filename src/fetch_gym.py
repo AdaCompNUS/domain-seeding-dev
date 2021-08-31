@@ -95,8 +95,11 @@ class FetchPushEnv(gym.Env):
             Run simulation with real-time speed, e.g., for visualizing an episode
             '''
 
-            self.robot.plan_to_ee_pose(start_ee_pos, start_ee_ori)
-            self.robot.ctrl_to_ee_pose(end_ee_pos, end_ee_ori, duration=5) #
+            succ = self.robot.plan_to_ee_pose(start_ee_pos, start_ee_ori)
+            if succ:
+                self.robot.ctrl_to_ee_pose(end_ee_pos, end_ee_ori, duration=5) #
+            else:
+                print("Robot failed to execute action!!!")
             print(self.robot.get_ee_pose())
 
         elif mode == 'super':

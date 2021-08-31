@@ -19,9 +19,10 @@ class GType(Enum):
 
 
 class PrimitiveState:
-    def __init__(self, id: int, type: PType, pos: List[float], ori: List[float]):
+    def __init__(self, id: int, type: PType, scale: List[float], pos: List[float], ori: List[float]):
         self.id = id
         self.type = type
+        self.scale = scale
         self.pos = pos
         self.quaternion = ori
 
@@ -29,6 +30,7 @@ class PrimitiveState:
 class ObjState:
     def __init__(self, p_states: List[PrimitiveState]):
         self.primitives = p_states
+        self.scale = p_states[0].scale
         self.pos = p_states[0].pos
         self.quaternion = p_states[0].quaternion
 

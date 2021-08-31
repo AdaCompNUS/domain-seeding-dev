@@ -5,6 +5,7 @@ import pybullet as p
 class Primitive:
     def __init__(self, type: PType, args: List[float]):
         self.id = None
+        self.scale = None
         if type == PType.BOX:
             size_x = args[0]
             size_y = args[1]
@@ -19,6 +20,7 @@ class Primitive:
             colBoxId = p.createCollisionShape(p.GEOM_BOX, halfExtents=[size_x / 2.0, size_y / 2.0, size_z / 2.0])
             self.id = p.createMultiBody(baseMass=1, baseCollisionShapeIndex=colBoxId,
                                         basePosition=[pos_x, pos_y, pos_z], baseOrientation=quaternion)
+            self.scale = args[0:3]
 
         elif type == PType.BALL:
             radius = args[0]
@@ -31,6 +33,7 @@ class Primitive:
             colBoxId = p.createCollisionShape(p.GEOM_SPHERE, radius=radius)
             self.id = p.createMultiBody(baseMass=1, baseCollisionShapeIndex=colBoxId,
                                         basePosition=[pos_x, pos_y, pos_z])
+            self.scale = args[0:1]
 
         elif type == PType.CYLINDER:
             radius = args[0]
@@ -45,6 +48,7 @@ class Primitive:
             colBoxId = p.createCollisionShape(p.GEOM_CYLINDER, radius=radius, height=length)
             self.id = p.createMultiBody(baseMass=1, baseCollisionShapeIndex=colBoxId,
                                         basePosition=[pos_x, pos_y, pos_z], baseOrientation=quaternion)
+            self.scale = args[0:2]
 
         elif type == PType.ELLIPSOID:
             radius_x = args[0]
@@ -58,19 +62,22 @@ class Primitive:
             spawn a ellipsoid TODO
             '''
             # self.shape = ...
+            self.scale = args[0:3]
             raise Exception('Unsupported primitive type')
 
         elif type == PType.FRUSTUM:
-            pos_x = args[0]
-            pos_y = args[1]
-            pos_z = args[2]
-            radius_top = args[3]
-            radius_base = args[4]
-            quaternion = args[5:9]
+            height = args[0]
+            radius_top = args[1]
+            radius_base = args[2]
+            pos_x = args[3]
+            pos_y = args[4]
+            pos_z = args[5]
+            quaternion = args[6:10]
             '''
             spawn a frustum TODO
             '''
             # self.shape = ...
+            self.scale = args[0:3]
             raise Exception('Unsupported primitive type')
 
         else:
@@ -105,7 +112,7 @@ class Object:
         p_states = []
         for primitive in self.primitives:
             pos, orientation = p.getBasePositionAndOrientation(primitive.id)
-            p_states.append(PrimitiveState(primitive.id, primitive.type, pos, orientation))
+            p_states.append(PrimitiveState(primitive.id, primitive.type, primitive.scale, pos, orientation))
             # states[primitive.id] = {
             #     "type": primitive.type,
             #     "pos": pos,

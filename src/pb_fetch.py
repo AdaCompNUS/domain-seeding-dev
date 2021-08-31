@@ -93,8 +93,10 @@ class FetchRobot:
         arm_path = self.fetch_mp.plan_to_pose_goal(tgt_pos, tgt_ori)
         if arm_path is not None:
             self.fetch_mp.execute(arm_path)
+            return True
         else:
             print("[FetchRobot] ERROR: planning failed")
+            return False
 
     def ctrl_to_ee_pose(self, tgt_pos, tgt_ori, duration = 3.0):
         '''

@@ -1,7 +1,9 @@
 from numpy import random as random
 from typing import List
+import math
 from utils import PType
 from pyquaternion import Quaternion
+import pybullet as p
 
 
 class PrimitiveRandomizer:
@@ -31,7 +33,8 @@ class PrimitiveRandomizer:
         pos_args[2] += max(shape_args)  # shift above the surface of the table
         p_args = shape_args + pos_args
         if self.REQUIRE_QUAT[p_type]:
-            p_args = p_args + list(Quaternion.random())
+            # p_args = p_args + list(Quaternion.random())
+            p_args = p_args + list(p.getQuaternionFromEuler([0, math.radians(90), math.radians(random.uniform(-180.0, 180.0))]))
         return p_type, p_args
 
     def _sample_type(self):
