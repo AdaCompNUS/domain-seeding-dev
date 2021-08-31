@@ -18,10 +18,19 @@ class GType(Enum):
     WITHIN_BOX = 4  # manipulate object to stay within a box
 
 
+class PrimitiveState:
+    def __init__(self, id: int, type: PType, pos: List[float], ori: List[float]):
+        self.id = id
+        self.type = type
+        self.pos = pos
+        self.quaternion = ori
+
+
 class ObjState:
-    def __init__(self, args: List[float]):
-        self.pos = args[0:3]
-        self.quaternion = args[3:7]
+    def __init__(self, p_states: List[PrimitiveState]):
+        self.primitives = p_states
+        self.pos = p_states[0].pos
+        self.quaternion = p_states[0].quaternion
 
 
 class TaskGoal:

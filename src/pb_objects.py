@@ -102,13 +102,15 @@ class Object:
             del p
 
     def get_states(self):
-        states = {}
+        p_states = []
         for primitive in self.primitives:
             pos, orientation = p.getBasePositionAndOrientation(primitive.id)
-            states[primitive.id] = {
-                "type": primitive.type,
-                "pos": pos,
-                "orientation": orientation
-            }
+            p_states.append(PrimitiveState(primitive.id, primitive.type, pos, orientation))
+            # states[primitive.id] = {
+            #     "type": primitive.type,
+            #     "pos": pos,
+            #     "orientation": orientation
+            # }
 
-        return states
+        o_state = ObjState(p_states)
+        return o_state

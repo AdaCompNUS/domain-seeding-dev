@@ -14,6 +14,7 @@ from utils import *
 from pb_fetch import FetchRobot
 from pb_objects import Object
 from domain_randomization import ObjectRandomizer
+from exploration import ExplorationPolicy
 
 
 class FetchPushEnv(gym.Env):
@@ -74,11 +75,14 @@ class FetchPushEnv(gym.Env):
             '''
             self.robot.reset()
 
+        info = {}
+        info['obj_state'] = self.object.get_states() # get true object state from simulator
+
         '''
         get the depth image as observation
         '''
         obs = self._get_depth()
-        return obs # I need these two types of infos for different purposes: the former for learning, the latter for planning
+        return obs, info # I need these two types of infos for different purposes: the former for learning, the latter for planning
 
     def step(self, action, mode='normal'):
         '''
@@ -123,9 +127,10 @@ class FetchPushEnv(gym.Env):
 
     def render(self):
         '''
-        render the camera image to the window ONLY when this function is called.
+        render the camera image to the window using OpenCV ONLY when this function is called.
         other than this function, the system should run in headless mode.
         '''
+
 
     def _add_table(self, pos=[0, 0.8, 0], orientation=[0,0,0,1]):
         '''
@@ -148,9 +153,11 @@ if __name__ == '__main__':
     env = FetchPushEnv(gui=True)
 
     randomizer = ObjectRandomizer()
+    exp_policy = ExplorationPolicy()
     prm_types, prm_argss = randomizer.sample(num_objects=1)
     # prm_types = [PType.BOX]
     # prm_argss = [[0, 0.75, 0.55, 0.1, 0.1, 0.1, 0, 0, 0, 1]]
-    obs = env.reset(prm_types=prm_types, prm_argss=prm_argss)
-    obs, reward, done, info = env.step(([0, 0.6, 0.6], p.getQuaternionFromEuler([0, 0, math.radians(90)]), [0, 0.8, 0.6], p.getQuaternionFromEuler([0, 0, math.radians(90)])))
+    obs, info = env.reset(prm_types=prm_types, prm_argss=prm_argss)
+    obs, reward, done, info = env.step(exp_policy.next_action(info['obj_state']))
+    input()
 
