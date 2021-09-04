@@ -20,8 +20,10 @@ class PrimitiveRandomizer:
                 PType.CYLINDER: [0.1, 0.1],
                 PType.ELLIPSOID: [0.1, 0.1, 0.1],
                 PType.FRUSTUM: [0.1, 0.1]}
-    POS_LB = [-0.3, 0.5, 0.5]  # [-0.5, 0.3, 0.5]
-    POS_UB = [0.3, 1.0, 0.5]  # [0.5, 1.3, 0.5]  # table height is 0.5
+    # TODO to finetune these values
+    # valid x: -0.1~0.1, valid y :0.5~0.8, valid z is 0.5
+    POS_LB = [-0.2, 0.5, 0.5]
+    POS_UB = [0.2, 0.8, 0.5]
 
     def __init__(self):
         pass

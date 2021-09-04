@@ -140,7 +140,6 @@ class FetchMotionPlanningPyBullet(object):
             self_collisions = False
             mp_obstacles = []
 
-        plan_arm_start = time()
         p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, False)
         state_id = p.saveState()
 
@@ -219,7 +218,7 @@ class FetchMotionPlanningPyBullet(object):
                 restPoses=rest_position,
                 jointDamping=joint_damping,
                 solver=p.IK_DLS,
-                maxNumIterations=100)
+                maxNumIterations=500)
 
             arm_joint_positions = arm_joint_positions[2:10]
 
@@ -286,6 +285,8 @@ class FetchMotionPlanningPyBullet(object):
         """
 
         joint_positions = self.get_arm_joint_positions(ee_pos, ee_ori)
+        if joint_positions is None:
+            return None
         arm_path = None
         for _ in range(num_of_attempts):
             arm_path = self.plan_to_joint_goal(joint_positions)
