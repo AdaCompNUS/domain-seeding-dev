@@ -105,8 +105,9 @@ class Object:
         pass
 
     def __del__(self):
-        for p in self.primitives:
-            del p
+        for prim in self.primitives:
+            p.removeBody(prim.id)
+            del prim
 
     def get_states(self):
         p_states = []
