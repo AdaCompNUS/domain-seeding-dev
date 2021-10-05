@@ -2,6 +2,7 @@ import math
 from enum import Enum
 from typing import List
 
+''' Util classes '''
 
 class PType(Enum):
     BOX = 1
@@ -54,3 +55,24 @@ class TaskGoal:
             dist_x = math.fabs(state.pos[0] - self.args[0])
             dist_y = math.fabs(state.pos[1] - self.args[1])
             return dist_x < self.args[2] and dist_y < self.args[3]
+
+
+class AverageMeter(object):
+    """
+    A utility class to compute statisitcs of losses and accuracies
+    """
+
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.sum += val * n
+        self.count += n
+        self.avg = self.sum / self.count

@@ -1,4 +1,4 @@
-from utils import ObjState
+from utils.classes import ObjState
 import math
 import pybullet as p
 

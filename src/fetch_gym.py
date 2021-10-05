@@ -10,7 +10,7 @@ import pybullet_data
 import os
 from typing import List
 
-from utils import *
+from utils.classes import *
 from pb_fetch import FetchRobot
 from pb_objects import Object
 from domain_randomization import ObjectRandomizer

@@ -1,4 +1,4 @@
-from utils import *
+from utils.classes import *
 import pybullet as p
 
 

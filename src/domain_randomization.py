@@ -1,7 +1,7 @@
 from numpy import random as random
 from typing import List
 import math
-from utils import PType
+from utils.classes import PType
 from pyquaternion import Quaternion
 import pybullet as p
 
