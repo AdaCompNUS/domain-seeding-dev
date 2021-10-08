@@ -75,8 +75,11 @@ class ParameterizedPolicy():
         return 'parameterized policy:\n  start {}\n  ori {}\n  end {}\n  ori {}\n  duration {}'.format(
             self.start_pos, self.start_euler, self.end_pos, self.end_euler, self.duration)
 
-    def serialize(self):
+    def refract(self):
         return self.start_pos, self.start_ori, self.end_pos, self.end_ori, self.duration
+
+    def serialize(self):
+        return self.start_pos + list(self.start_euler) + self.end_pos + list(self.end_euler) + [self.duration]
 
     def trans_dist(self):
         return math.sqrt((self.start_pos[0] - self.end_pos[0]) ** 2 +

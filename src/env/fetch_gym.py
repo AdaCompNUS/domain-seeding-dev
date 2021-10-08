@@ -141,7 +141,7 @@ class FetchPushEnv(gym.Env):
         self.depth_seq.clear()
         self.mask_seq.clear()
 
-        start_ee_pos, start_ee_ori, end_ee_pos, end_ee_ori, duration = action.serialize()
+        start_ee_pos, start_ee_ori, end_ee_pos, end_ee_ori, duration = action.refract()
         if mode == 'normal':
             '''
             Run simulation with real-time speed, e.g., for visualizing an episode

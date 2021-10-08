@@ -9,4 +9,4 @@ virtual_replay_port = 7106
 
 
 NUM_PARAMS_TO_LEARN = 2
-PARAM_SEARCH_BOUNDS = [[-2.0, 2.0], [-2.0, 2.0]]
+PARAM_SEARCH_BOUNDS = [[-0.1, 0.1], [-0.1, 0.1]]
