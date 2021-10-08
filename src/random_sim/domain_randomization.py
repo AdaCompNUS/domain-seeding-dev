@@ -54,6 +54,11 @@ class ObjectRandomizer:
             p_type, p_args = self.randomizer.sample()
             prm_types.append(p_type)
             prm_argss.append(p_args)
+        print('[dr] randomize object configuration:\n  types {}'.format(prm_types))
+        print('[dr] args\n  radius {}\n  length {}\n  pos {}\n  quat {}'.format(
+            prm_argss[0][0], prm_argss[0][1],
+            prm_argss[0][2:5], prm_argss[0][5:9]
+        ))
         return prm_types, prm_argss
 
 

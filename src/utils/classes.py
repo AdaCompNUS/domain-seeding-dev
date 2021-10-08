@@ -1,6 +1,8 @@
 import math
 from enum import Enum
 from typing import List
+import pybullet as p
+from pyquaternion import Quaternion
 
 ''' Util classes '''
 
@@ -55,6 +57,35 @@ class TaskGoal:
             dist_x = math.fabs(state.pos[0] - self.args[0])
             dist_y = math.fabs(state.pos[1] - self.args[1])
             return dist_x < self.args[2] and dist_y < self.args[3]
+
+
+class ParameterizedPolicy():
+    dim = 13
+
+    def __init__(self, x):
+        self.start_pos = x[0:3]
+        self.start_euler = x[3:6]
+        self.start_ori = p.getQuaternionFromEuler(self.start_euler)
+        self.end_pos = x[6:9]
+        self.end_euler = x[9:12]
+        self.end_ori = p.getQuaternionFromEuler(self.end_euler)
+        self.duration = x[12]
+
+    def text(self):
+        return 'parameterized policy:\n  start {}\n  ori {}\n  end {}\n  ori {}\n  duration {}'.format(
+            self.start_pos, self.start_euler, self.end_pos, self.end_euler, self.duration)
+
+    def serialize(self):
+        return self.start_pos, self.start_ori, self.end_pos, self.end_ori, self.duration
+
+    def trans_dist(self):
+        return math.sqrt((self.start_pos[0] - self.end_pos[0]) ** 2 +
+                         (self.start_pos[1] - self.end_pos[1]) ** 2 +
+                         (self.start_pos[2] - self.end_pos[2]) ** 2)
+
+    def rot_dist(self):
+        return Quaternion.absolute_distance(
+            Quaternion(self.start_ori), Quaternion(self.end_ori))
 
 
 class AverageMeter(object):

@@ -1,17 +1,15 @@
 from igibson.robots.fetch_robot import Fetch
 from igibson.utils.utils import parse_config
-from igibson.objects.articulated_object import ArticulatedObject
-from igibson.external.pybullet_tools.utils import joints_from_names, set_joint_positions, link_from_name
+from igibson.external.pybullet_tools.utils import link_from_name
 import igibson.external.pybullet_tools.utils as pb_utils
 import os
 import time
-import numpy as np
 import pybullet as p
 import pybullet_data
 import igibson
 import math
 
-from fetch_pb_motion_planning import FetchMotionPlanningPyBullet
+from pb_modules.fetch_pb_motion_planning import FetchMotionPlanningPyBullet
 
 FETCH_EE_IDX = 19
 

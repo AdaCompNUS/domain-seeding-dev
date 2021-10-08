@@ -1,19 +1,20 @@
 import torch
 import torchvision
 from torch import nn
+from models.base import BaseNetwork
 
 
-class ISModel(nn.Module):
+class ISModel(BaseNetwork):
     '''
     A simple system identification model that encodes a stack of image observations,
     concatenate the feature with the hypothetical system parameter set, xi_h,
     and predict (xi_gt - xi_h), where xi_gt is the ground truth parameter.
     '''
-    def __init__(self, time_steps=8, num_params=5):
+    def __init__(self, time_channels=8, num_param=5):
         super(ISModel, self).__init__()
         self.flatten = nn.Flatten()
         self.cnn = nn.Sequential(
-            nn.Conv2d(in_channels=time_steps, out_channels=64, kernel_size=(3,3), stride=(2,2), padding=1),
+            nn.Conv2d(in_channels=time_channels, out_channels=64, kernel_size=(3, 3), stride=(2, 2), padding=1),
             nn.ReLU(inplace=True),
             nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(3, 3), stride=(1, 1), padding=1),
             nn.ReLU(inplace=True),
@@ -26,10 +27,11 @@ class ISModel(nn.Module):
             nn.AdaptiveMaxPool2d(output_size=(1, 1))
         )
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(1024 + num_params, 128),
+            nn.Linear(1024 + num_param, 128),
             nn.ReLU(),
-            nn.Linear(128, num_params),
+            nn.Linear(128, num_param),
         )
+        print(self)
 
     def forward(self, x, hypo_xi):
         '''

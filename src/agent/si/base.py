@@ -32,16 +32,19 @@ class BaseOfflineAgent:
         raise Exception('You need to implement interval method.')
 
     def update_params(self, optim, network, loss, grad_clip=None):
-        mean_grads = None
-        optim.zero_grad()
-        loss.backward(retain_graph=True)
-        if grad_clip is not None:
-            for p in network.modules():
-                torch.nn.utils.clip_grad_norm_(p.parameters(), grad_clip)
-        if network is not None:
-            mean_grads = self.calc_mean_grads(network)
-        optim.step()
-        return mean_grads
+        try:
+            mean_grads = None
+            optim.zero_grad()
+            loss.backward(retain_graph=True)
+            if grad_clip is not None:
+                for p in network.modules():
+                    torch.nn.utils.clip_grad_norm_(p.parameters(), grad_clip)
+            if network is not None:
+                mean_grads = self.calc_mean_grads(network)
+            optim.step()
+            return mean_grads
+        except Exception as e:
+            error_handler(e)
 
     def calc_mean_grads(self, network):
         total_grads = 0
@@ -66,16 +69,20 @@ class BaseOfflineAgent:
         except Exception as e:
             error_handler(e)
 
-    def load_memory(self, is_train=True):
+    def load_memory(self, is_train=True, max_blocks=10):
         try:
             self.last_replay_block, new_memory = self.replay_service.fetch_memory(self.last_replay_block)
-            while new_memory is not None:
+            parsed_blocks = 0
+            while new_memory is not None and parsed_blocks < max_blocks:
                 print_flush('[leaner_base] loaded memory at block {}'.format(self.last_replay_block))
                 if is_train:
                     self.train_memory.load(new_memory)
                 else:
                     self.test_memory.load(new_memory)
+                print_flush('[leaner_base] memory size: train {}, val {}'.format(
+                    len(self.train_memory), len(self.test_memory)))
                 self.last_replay_block, new_memory = self.replay_service.fetch_memory(self.last_replay_block)
+                parsed_blocks += 1
         except Exception as e:
             error_handler(e)
 

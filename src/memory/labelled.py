@@ -3,6 +3,9 @@ import torch
 from torch.utils.data import Dataset
 from torchvision import transforms
 from torchvision.transforms import *
+from utils.functions import error_handler
+from utils.variables import PARAM_SEARCH_BOUNDS
+import sys
 
 
 class LabelledMemory(Dataset):
@@ -19,11 +22,11 @@ class LabelledMemory(Dataset):
             ToTensor(),
             # Normalize(mean=[0.5071, 0.4866, 0.4409], std=[0.2675, 0.2565, 0.2761])
         ])
-        self.target_transform = Compose([
-            # Resize((96, 96)),
-            ToTensor(),
-            # Normalize(mean=[0.5071, 0.4866, 0.4409], std=[0.2675, 0.2565, 0.2761])
-        ])
+        # self.target_transform = Compose([
+        #     # Resize((96, 96)),
+        #     ToTensor(),
+        #     # Normalize(mean=[0.5071, 0.4866, 0.4409], std=[0.2675, 0.2565, 0.2761])
+        # ])
 
         self.reset()
 
@@ -51,28 +54,30 @@ class LabelledMemory(Dataset):
 
     def get(self):
         valid = slice(0, self._n)
-        return (
-            self.images[valid], self.labels[valid])
+        return self.images[valid], self.labels[valid]
 
     def load(self, batch):
-        num_data = len(batch[0])
+        try:
+            num_data = len(batch[0])
 
-        if self._p + num_data <= self.capacity:
-            self._insert(
-                slice(self._p, self._p+num_data), batch,
-                slice(0, num_data))
-        else:
-            mid_index = self.capacity-self._p
-            end_index = num_data - mid_index
-            self._insert(
-                slice(self._p, self.capacity), batch,
-                slice(0, mid_index))
-            self._insert(
-                slice(0, end_index), batch,
-                slice(mid_index, num_data))
+            if self._p + num_data <= self.capacity:
+                self._insert(
+                    slice(self._p, self._p + num_data), batch,
+                    slice(0, num_data))
+            else:
+                mid_index = self.capacity - self._p
+                end_index = num_data - mid_index
+                self._insert(
+                    slice(self._p, self.capacity), batch,
+                    slice(0, mid_index))
+                self._insert(
+                    slice(0, end_index), batch,
+                    slice(mid_index, num_data))
 
-        self._n = min(self._n + num_data, self.capacity)
-        self._p = (self._p + num_data) % self.capacity
+            self._n = min(self._n + num_data, self.capacity)
+            self._p = (self._p + num_data) % self.capacity
+        except Exception as e:
+            error_handler(e)
 
     def _insert(self, mem_indices, batch, batch_indices):
         images, labels = batch
@@ -86,11 +91,21 @@ class LabelledMemory(Dataset):
             image = self.images[idx]
 
         label = self.labels[idx]
-        if self.transform:
-            image = self.transform(image)
-        if self.target_transform:
-            label = self.target_transform(label)
-        return image, label
+
+        # print('image size in dataset {}'.format(image.shape))
+        # sys.stdout.flush()
+        # if self.transform:
+        #     image = self.transform(image)
+        image = torch.FloatTensor(image)
+        label = torch.FloatTensor(label)
+        guess = label + torch.FloatTensor(
+            np.random.uniform(
+                [PARAM_SEARCH_BOUNDS[0][0], PARAM_SEARCH_BOUNDS[0][1]],
+                [PARAM_SEARCH_BOUNDS[1][0], PARAM_SEARCH_BOUNDS[1][1]]
+            ))
+        # if self.target_transform:
+        #     label = self.target_transform(label)
+        return image, guess, label
 
     def __len__(self):
         return self._n

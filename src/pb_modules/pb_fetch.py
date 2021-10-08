@@ -6,8 +6,7 @@ from igibson.utils.utils import parse_config
 import igibson.external.pybullet_tools.utils as pb_utils
 import time
 from igibson.external.pybullet_tools.utils import joints_from_names, set_joint_positions
-from fetch_pb_motion_planning import FetchMotionPlanningPyBullet
-from igibson.simulator import Simulator
+from pb_modules.fetch_pb_motion_planning import FetchMotionPlanningPyBullet
 import pybullet as p
 
 class FetchRobot:
