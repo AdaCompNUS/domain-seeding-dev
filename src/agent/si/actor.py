@@ -165,7 +165,7 @@ if __name__ == "__main__":
             'actor_id': args.aid,
             'seed': args.seed,
             'num_objects': 1,
-            'dataset_size': 12000,
+            'dataset_size': 120000,
             'log_interval': 10,
             'memory_save_interval': 5,
         }
