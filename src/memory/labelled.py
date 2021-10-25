@@ -4,7 +4,7 @@ from torch.utils.data import Dataset
 from torchvision import transforms
 from torchvision.transforms import *
 from utils.functions import error_handler
-from utils.variables import PARAM_SEARCH_BOUNDS
+from random_sim.domain_randomization import PrimitiveRandomizer
 import sys
 
 
@@ -43,14 +43,17 @@ class LabelledMemory(Dataset):
         self._append(images, label)
 
     def _append(self, images, label):
-        images = np.array(images, dtype=self.image_type)
-        label = np.array(label, dtype=np.float32)
+        try:
+            images = np.array(images, dtype=self.image_type)
+            label = np.array(label, dtype=np.float32)
 
-        self.images[self._p] = images
-        self.labels[self._p] = label
+            self.images[self._p] = images
+            self.labels[self._p] = label
 
-        self._n = min(self._n + 1, self.capacity)
-        self._p = (self._p + 1) % self.capacity
+            self._n = min(self._n + 1, self.capacity)
+            self._p = (self._p + 1) % self.capacity
+        except Exception as e:
+            error_handler(e)
 
     def get(self):
         valid = slice(0, self._n)
@@ -99,10 +102,7 @@ class LabelledMemory(Dataset):
         image = torch.FloatTensor(image)
         label = torch.FloatTensor(label)
         guess = label + torch.FloatTensor(
-            np.random.uniform(
-                [PARAM_SEARCH_BOUNDS[0][0], PARAM_SEARCH_BOUNDS[0][1]],
-                [PARAM_SEARCH_BOUNDS[1][0], PARAM_SEARCH_BOUNDS[1][1]]
-            ))
+            np.random.uniform(low=PrimitiveRandomizer.SEARCH_LB, high=PrimitiveRandomizer.SEARCH_UB))
         # if self.target_transform:
         #     label = self.target_transform(label)
         return image, guess, label

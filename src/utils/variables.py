@@ -1,4 +1,5 @@
 ''' Util variables '''
+from enum import Enum
 data_host = "127.0.0.1"
 param_port = 7101
 replay_port = 7102
@@ -8,5 +9,6 @@ labeller_port = 7105
 virtual_replay_port = 7106
 
 
-NUM_PARAMS_TO_LEARN = 2
-PARAM_SEARCH_BOUNDS = [[-0.1, 0.1], [-0.1, 0.1]]
+LOGGING_MIN = 0
+LOGGING_INFO = 1
+LOGGING_DEBUG = 2

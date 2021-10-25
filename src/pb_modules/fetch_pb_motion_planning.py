@@ -199,7 +199,7 @@ class FetchMotionPlanningPyBullet(object):
             self.get_ik_parameters()
 
         n_attempt = 0
-        max_attempt = 75
+        max_attempt = 3
         sample_fn = get_sample_fn(self.robot_id, self.arm_joint_ids)
         base_pose = get_base_values(self.robot_id)
         state_id = p.saveState()
@@ -229,7 +229,7 @@ class FetchMotionPlanningPyBullet(object):
                 self.robot.get_end_effector_position(), arm_ik_goal)
             # print('dist', dist)
             if dist > self.arm_ik_threshold:
-                print('[FetchPbMP/IK] WARN: dist too large')
+                # print('[FetchPbMP/IK] WARN: dist too large')
                 n_attempt += 1
                 continue
 
@@ -249,7 +249,7 @@ class FetchMotionPlanningPyBullet(object):
 
             if not collision_free:
                 n_attempt += 1
-                print('[FetchPbMP/IK] WARN: arm has collision')
+                # print('[FetchPbMP/IK] WARN: arm has collision')
                 continue
 
             # gripper should not have any self-collision
@@ -260,7 +260,7 @@ class FetchMotionPlanningPyBullet(object):
                 body_b=self.robot_id)
             if not collision_free:
                 n_attempt += 1
-                print('[FetchPbMP/IK] WARN: gripper has collision')
+                # print('[FetchPbMP/IK] WARN: gripper has collision')
                 continue
 
             #self.episode_metrics['arm_ik_time'] += time() - ik_start

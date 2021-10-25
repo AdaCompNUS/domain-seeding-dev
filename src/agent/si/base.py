@@ -95,6 +95,8 @@ class BaseOfflineAgent:
 
     def update_memory(self, images, label):
         try:
+            assert(images is not None)
+            assert(label is not None)
             self.train_memory.append(images, label)
         except Exception as e:
             error_handler(e)

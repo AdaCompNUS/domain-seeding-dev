@@ -99,7 +99,7 @@ class SIActor(BaseOfflineAgent):
             episode_done = False
 
             prm_types, prm_argss = self.sim_randomizer.sample(num_objects=self.num_objects)
-            obs, info = self.env.reset(prm_types=prm_types, prm_argss=prm_argss)
+            obs, info = self.env.reset(prm_types=prm_types, prm_argss=prm_argss, mode='quick')
             obj_state = info['obj_state']
 
             if obs is None:
@@ -109,9 +109,12 @@ class SIActor(BaseOfflineAgent):
             if self.render:
                 self.env.render()
 
-            obs_seq, reward, terminal, info1 = self.env.step(self.policy.next_action(info['obj_state']), mode='super')
+            obs_seq, reward, succeed, info1 = self.env.step(self.policy.next_action(info['obj_state']))
             self.steps += 1
-            self.update_memory(obs_seq, obj_state.scale)
+            if succeed:
+                self.update_memory(obs_seq, obj_state.serialize())
+            else:
+                print_flush('[actor.py ]Episode failed, not recording data')
 
             now = time.time()
             print(' ' * self.space_size,
@@ -153,7 +156,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     use_data = False
-    with FetchPushEnv(gui=False) as fetch_env:
+    with FetchPushEnv(gui=True) as fetch_env:
         config = {
             'env': fetch_env,
             'cuda': True,

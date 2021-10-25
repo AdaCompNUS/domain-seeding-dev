@@ -2,6 +2,7 @@ import torch
 import torchvision
 from torch import nn
 from models.base import BaseNetwork
+from utils.classes import ObjState
 
 
 class ISModel(BaseNetwork):
@@ -10,7 +11,7 @@ class ISModel(BaseNetwork):
     concatenate the feature with the hypothetical system parameter set, xi_h,
     and predict (xi_gt - xi_h), where xi_gt is the ground truth parameter.
     '''
-    def __init__(self, time_channels=8, num_param=5):
+    def __init__(self, time_channels, num_param):
         super(ISModel, self).__init__()
         self.flatten = nn.Flatten()
         self.cnn = nn.Sequential(
@@ -45,6 +46,6 @@ class ISModel(BaseNetwork):
 
 
 if __name__ == '__main__':
-    model = ISModel()
+    model = ISModel(time_channels=8, num_param=5)
     print(model)
     print(model(torch.randn(2, 8, 112, 112), torch.rand(2, 5)).shape)
