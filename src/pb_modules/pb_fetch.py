@@ -165,26 +165,30 @@ class FetchRobot:
 
                 if step % stride == 0 or step == ctrl_steps - 1:
                     time1 = time.time()
-                    jointPoses = p.calculateInverseKinematics(self.fetchId,
+                    ik_res = p.calculateInverseKinematics(self.fetchId,
                                                               self.fetch_ee_idx,
                                                               cur_pos,
                                                               cur_ori,
                                                               maxNumIterations=100,
                                                               residualThreshold=.01)
+
+                    if ik_res:
+                        jointPoses = ik_res
                     # print(jointPoses)
                     # print(start_y)
                     ik_time += float(time.time() - time1)
 
                     time1 = time.time()
-                    for i in range(len(self.fetch_non_fixed_joints)):
-                        p.setJointMotorControl2(bodyIndex=self.fetchId,
-                                                jointIndex=self.fetch_non_fixed_joints[i],
-                                                controlMode=p.POSITION_CONTROL,
-                                                targetPosition=jointPoses[i],
-                                                targetVelocity=0,
-                                                force=500,
-                                                positionGain=0.03,
-                                                velocityGain=1)
+                    if jointPoses:
+                        for i in range(len(self.fetch_non_fixed_joints)):
+                            p.setJointMotorControl2(bodyIndex=self.fetchId,
+                                                    jointIndex=self.fetch_non_fixed_joints[i],
+                                                    controlMode=p.POSITION_CONTROL,
+                                                    targetPosition=jointPoses[i],
+                                                    targetVelocity=0,
+                                                    force=500,
+                                                    positionGain=0.03,
+                                                    velocityGain=1)
                     set_control_time += float(time.time() - time1)
 
                 time1 = time.time()
@@ -236,9 +240,9 @@ class FetchRobot:
                         time.sleep(1.0 / self.simulation_freq - used_time)
             settle_wait_time += float(time.time() - start_time)
 
-            print(f'[pb_fetch.py] time record: '
-                  f'\n IK {ik_time} \n Set control {set_control_time} '
-                  f'\n Step cb {cb_time} \n Step sim {step_sim_time} \n Sleep tim {sleep_time}'
-                  f'\n Move {move_time} \n Settle {settle_wait_time}')
+            # print(f'[pb_fetch.py] time record: '
+                  # f'\n IK {ik_time} \n Set control {set_control_time} '
+                  # f'\n Step cb {cb_time} \n Step sim {step_sim_time} \n Sleep tim {sleep_time}'
+                  # f'\n Move {move_time} \n Settle {settle_wait_time}')
         except Exception as e:
             error_handler(e)

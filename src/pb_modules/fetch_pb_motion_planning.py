@@ -199,7 +199,7 @@ class FetchMotionPlanningPyBullet(object):
             self.get_ik_parameters()
 
         n_attempt = 0
-        max_attempt = 3
+        max_attempt = 2
         sample_fn = get_sample_fn(self.robot_id, self.arm_joint_ids)
         base_pose = get_base_values(self.robot_id)
         state_id = p.saveState()

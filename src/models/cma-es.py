@@ -38,6 +38,7 @@ class CMA_ES:
         self.pop_size = pop_size
         self.end_iter = end_iter
         self.logging_level = logging_level
+        env.logging_level = logging_level
 
     def print_with_level(self, msg, level=LOGGING_DEBUG):
         if self.logging_level >= level:
@@ -94,7 +95,7 @@ if __name__ == '__main__':
     from random_sim.domain_randomization import ObjectRandomizer
     from utils.classes import TaskGoal, GType
 
-    env = FetchPushEnv(gui=True, logging_level=LOGGING_MIN)
+    env = FetchPushEnv(gui=False, logging_level=LOGGING_MIN)
     # env.render()
     randomizer = ObjectRandomizer()
     prm_types, prm_argss = randomizer.sample(num_objects=1)

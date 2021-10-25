@@ -194,16 +194,16 @@ class FetchPushEnv(gym.Env):
             self.print_with_level(f'Duration {duration}', LOGGING_INFO)
 
             start_time = time.time()
-            if not self.robot.set_ee_pose(end_ee_pos, end_ee_ori):
-                self.print_with_level('End ee pose not feasible', LOGGING_INFO)
-                return None, -1000, False, {}
+            # if not self.robot.set_ee_pose(end_ee_pos, end_ee_ori):
+            #     self.print_with_level('End ee pose not feasible', LOGGING_INFO)
+            #     return None, -1000, False, {}
 
             if not self.robot.set_ee_pose(start_ee_pos, start_ee_ori):
                 self.print_with_level('Start ee pose not feasible', LOGGING_INFO)
                 return None, -1000, False, {}
 
             self.print_with_level('[fetch_gym.py] pose check duration {}'.format(time.time() - start_time),
-                                  LOGGING_DEBUG)
+                                  LOGGING_MIN)
 
             if self.mode == 'normal':
                 '''
@@ -241,7 +241,7 @@ class FetchPushEnv(gym.Env):
                 raise Exception('Unsupported simulation mode {}'.format(self.mode))
             self.print_with_level('[fetch_gym.py] Simulation mode {}'.format(self.mode), LOGGING_INFO)
             self.print_with_level('[fetch_gym.py] move duration {}'.format(time.time() - start_time),
-                                  LOGGING_DEBUG)
+                                  LOGGING_MIN)
             sys.stdout.flush()
 
             info = {}
