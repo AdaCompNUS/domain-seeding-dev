@@ -24,7 +24,7 @@ from models.exploration import ExplorationPolicy
 
 # ------- Settings ----------
 SIMULATION_FREQ = 60
-CAMERA_FREQ = 5  # Due to the speed of getCameraImage, this has to be slower than 20Hz depending on the machine
+CAMERA_FREQ = 3  # Due to the speed of getCameraImage, this has to be slower than 20Hz depending on the machine
 
 
 class FetchPushEnv(gym.Env):
@@ -302,7 +302,7 @@ class FetchPushEnv(gym.Env):
         self.rgb_seq.append(rgb)
         self.depth_seq.append(depth)
         self.mask_seq.append(mask)
-        cv2.imwrite(f'snapshot{len(self.rgb_seq)}.jpg', rgb)
+        # cv2.imwrite(f'snapshot{len(self.rgb_seq)}.jpg', rgb)
 
     def _remove_table(self):
         '''
@@ -398,7 +398,7 @@ class FetchPushEnv(gym.Env):
 
 
 if __name__ == '__main__':
-    env = FetchPushEnv(gui=False, logging_level=LOGGING_DEBUG)
+    env = FetchPushEnv(gui=False, logging_level=LOGGING_MIN)
     # env.render()
 
     logId = p.startStateLogging(p.STATE_LOGGING_PROFILE_TIMINGS, "timings")

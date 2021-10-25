@@ -113,6 +113,7 @@ class SIActor(BaseOfflineAgent):
             self.steps += 1
             if succeed:
                 self.update_memory(obs_seq, obj_state.serialize())
+                print_flush(f'[actor.py ]Episode succeed, recording data with {obs_seq.shape} obs channels')
             else:
                 print_flush('[actor.py ]Episode failed, not recording data')
 
@@ -156,7 +157,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     use_data = False
-    with FetchPushEnv(gui=True) as fetch_env:
+    with FetchPushEnv(gui=False) as fetch_env:
         config = {
             'env': fetch_env,
             'cuda': True,
@@ -164,7 +165,7 @@ if __name__ == "__main__":
             'actor_id': args.aid,
             'seed': args.seed,
             'num_objects': 1,
-            'dataset_size': 300,
+            'dataset_size': 12000,
             'log_interval': 10,
             'memory_save_interval': 5,
         }
