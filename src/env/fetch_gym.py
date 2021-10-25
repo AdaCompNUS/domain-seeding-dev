@@ -193,6 +193,7 @@ class FetchPushEnv(gym.Env):
             self.print_with_level(f'Start ori {start_ee_ori}', LOGGING_INFO)
             self.print_with_level(f'Duration {duration}', LOGGING_INFO)
 
+            start_time = time.time()
             if not self.robot.set_ee_pose(end_ee_pos, end_ee_ori):
                 self.print_with_level('End ee pose not feasible', LOGGING_INFO)
                 return None, -1000, False, {}
@@ -200,6 +201,9 @@ class FetchPushEnv(gym.Env):
             if not self.robot.set_ee_pose(start_ee_pos, start_ee_ori):
                 self.print_with_level('Start ee pose not feasible', LOGGING_INFO)
                 return None, -1000, False, {}
+
+            self.print_with_level('[fetch_gym.py] pose check duration {}'.format(time.time() - start_time),
+                                  LOGGING_DEBUG)
 
             if self.mode == 'normal':
                 '''
@@ -235,8 +239,8 @@ class FetchPushEnv(gym.Env):
                 self.robot.ctrl_to_ee_pose(end_ee_pos, end_ee_ori, duration=duration, quick_mode=True)
             else:
                 raise Exception('Unsupported simulation mode {}'.format(self.mode))
-            self.print_with_level('Simulation mode {}'.format(self.mode), LOGGING_INFO)
-            self.print_with_level('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`move duration {}'.format(time.time() - start_time),
+            self.print_with_level('[fetch_gym.py] Simulation mode {}'.format(self.mode), LOGGING_INFO)
+            self.print_with_level('[fetch_gym.py] move duration {}'.format(time.time() - start_time),
                                   LOGGING_DEBUG)
             sys.stdout.flush()
 
@@ -394,7 +398,7 @@ class FetchPushEnv(gym.Env):
 
 
 if __name__ == '__main__':
-    env = FetchPushEnv(gui=False, logging_level=LOGGING_MIN)
+    env = FetchPushEnv(gui=False, logging_level=LOGGING_DEBUG)
     # env.render()
 
     logId = p.startStateLogging(p.STATE_LOGGING_PROFILE_TIMINGS, "timings")
@@ -424,7 +428,7 @@ if __name__ == '__main__':
         start_time = time.time()
         _, reward, done, info2 = env.step(exp_policy.next_action(info['obj_state']), generate_obs=False)
         end_time = time.time()
-        print(end_time - start_time)
+        print(f'Step time {end_time - start_time}')
 
         # print(info1['obj_state'].pos, info1['obj_state'].quaternion)
         # print(info2['obj_state'].pos, info2['obj_state'].quaternion)
