@@ -1,3 +1,5 @@
+import math
+
 import gym
 import numpy as np
 from gym import spaces
@@ -44,6 +46,7 @@ class FetchPushEnv(gym.Env):
 
         self.pb_client = None
         # connect to pybullet engine
+        self.gui = gui
         if gui:
             # p.connect(p.GUI)  # no GUI
             self.pb_client = bc.BulletClient(connection_mode=p.GUI)
@@ -147,6 +150,17 @@ class FetchPushEnv(gym.Env):
             self.print_with_level('[fetch_gym.py] Reset goal', LOGGING_INFO)
             if reset_goal:  # reset manipulation goal
                 self.goal = goal
+                if self.gui:
+                    last_theta = 0.0
+                    for theta in range(0, 361, 30):
+                        theta = math.radians(theta)
+                        start = [goal.args[0] + goal.args[2] * math.cos(last_theta),
+                                 goal.args[1] + goal.args[2] * math.sin(last_theta), 0.51]
+                        end = [goal.args[0] + goal.args[2] * math.cos(theta),
+                               goal.args[1] + goal.args[2] * math.sin(theta), 0.51]
+                        p.addUserDebugLine(start, end, lineColorRGB=[0, 1, 0], lineWidth=2.0, lifeTime=0,
+                                       physicsClientId=self.pb_client._client)
+                        last_theta = theta
 
             self.print_with_level('[fetch_gym.py] Reset robot', LOGGING_INFO)
             if reset_robot:
@@ -155,7 +169,7 @@ class FetchPushEnv(gym.Env):
                 '''
                 self.robot.reset()
 
-            if mode == 'normal':
+            if mode == 'normal' and self.gui:
                 self.frame_visualizer.add_inertial_frame(self.object.primitives[0].id, -1)
                 self.frame_visualizer.add_collision_frame(self.object.primitives[0].id, -1)
 
@@ -404,7 +418,7 @@ class FetchPushEnv(gym.Env):
 
 
 if __name__ == '__main__':
-    env = FetchPushEnv(gui=False, logging_level=LOGGING_MIN)
+    env = FetchPushEnv(gui=True, logging_level=LOGGING_MIN)
     # env.render()
 
     logId = p.startStateLogging(p.STATE_LOGGING_PROFILE_TIMINGS, "timings")
@@ -418,7 +432,7 @@ if __name__ == '__main__':
     prm_types, prm_argss = randomizer.sample(num_objects=1)
 
     sim_mode = 'super'
-    obs, info = env.reset(prm_types=prm_types, prm_argss=prm_argss, goal=TaskGoal(GType.BEYOND, [0, 1.0, 0.8]),
+    obs, info = env.reset(prm_types=prm_types, prm_argss=prm_argss, goal=TaskGoal(GType.WITHIN_CIRCLE, [0.2, 0.7, 0.1]),
                           reset_object=False, mode=sim_mode)
     # env.render()
     # # env.render()
