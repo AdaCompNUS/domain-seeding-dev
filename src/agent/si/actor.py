@@ -40,7 +40,7 @@ class SIActor(BaseOfflineAgent):
             self.memory_save_interval = memory_save_interval
             self.num_workers = num_workers
             self.num_epochs = num_epochs
-            memory_size = dataset_size
+            memory_size = dataset_size/10
             self.termination_step = dataset_size
             self.log_flag = 'exploration/ms_{}_seed_{}'.format(memory_size, seed)
             self.log_txt = open("actor_log_{}.txt".format(actor_id), "w")
