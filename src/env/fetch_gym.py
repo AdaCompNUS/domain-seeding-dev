@@ -298,7 +298,7 @@ class FetchPushEnv(gym.Env):
         self.rgb_seq.append(rgb)
         self.depth_seq.append(depth)
         self.mask_seq.append(mask)
-        cv2.imwrite(f'snapshot{len(self.rgb_seq)}', rgb)
+        cv2.imwrite(f'snapshot{len(self.rgb_seq)}.jpg', rgb)
 
     def _remove_table(self):
         '''
