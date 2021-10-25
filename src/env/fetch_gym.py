@@ -58,8 +58,11 @@ class FetchPushEnv(gym.Env):
 
         self.action_space = spaces.Box(low=-self.WS_RANGE, high=self.WS_RANGE,
                                        shape=(4,))  # A box in R^4. Each coordinate is bounded.
-        self.param_space = spaces.Box(low=np.atleast_1d(PrimitiveRandomizer.SEARCH_LB),
-                                      high=np.atleast_1d(PrimitiveRandomizer.SEARCH_UB),
+        # self.param_space = spaces.Box(low=np.atleast_1d(PrimitiveRandomizer.SEARCH_LB),
+        #                               high=np.atleast_1d(PrimitiveRandomizer.SEARCH_UB),
+        #                               shape=(ObjState.DIM_PREDICTIONS,))  # A box in R^4. Each coordinate is bounded.
+        self.param_space = spaces.Box(low=-10.0,  # dummy value
+                                      high=10.0,  # dummy value
                                       shape=(ObjState.DIM_PREDICTIONS,))  # A box in R^4. Each coordinate is bounded.
         self.observation_space = spaces.Box(low=0.0, high=self.MAX_DEPTH,
                                             shape=(self.NUM_DEPTH_SEGMENTS * self.NUM_OBS_FRAMES, self.OBS_RES, self.OBS_RES),
