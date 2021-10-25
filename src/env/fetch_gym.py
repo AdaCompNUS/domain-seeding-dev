@@ -408,7 +408,7 @@ if __name__ == '__main__':
     prm_types, prm_argss = randomizer.sample(num_objects=1)
 
     obs, info = env.reset(prm_types=prm_types, prm_argss=prm_argss, goal=TaskGoal(GType.BEYOND, [0, 1.0, 0.8]),
-                          reset_object=False, mode='quick')
+                          reset_object=False, mode='super')
     # env.render()
     # # env.render()
     # start_time = time.time()

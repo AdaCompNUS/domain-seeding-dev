@@ -164,6 +164,7 @@ class FetchRobot:
                 cur_ori += dist_ori_per_step
 
                 if step % stride == 0 or step == ctrl_steps - 1:
+                    start_time1 = time.time()
                     jointPoses = p.calculateInverseKinematics(self.fetchId,
                                                               self.fetch_ee_idx,
                                                               cur_pos,
@@ -172,9 +173,9 @@ class FetchRobot:
                                                               residualThreshold=.01)
                     # print(jointPoses)
                     # print(start_y)
-                    # ik_time += float(time.time() - start_time)
+                    ik_time += float(time.time() - start_time1)
 
-                    # start_time = time.time()
+                    start_time1 = time.time()
                     for i in range(len(self.fetch_non_fixed_joints)):
                         p.setJointMotorControl2(bodyIndex=self.fetchId,
                                                 jointIndex=self.fetch_non_fixed_joints[i],
@@ -184,18 +185,18 @@ class FetchRobot:
                                                 force=500,
                                                 positionGain=0.03,
                                                 velocityGain=1)
-                    # set_control_time += float(time.time() - start_time)
+                    set_control_time += float(time.time() - start_time1)
 
-                # time1 = time.time()
+                time1 = time.time()
                 if step_cb and step % camera_steps == 0:
                     step_cb()
-                # cb_time += float(time.time() - time1)
+                cb_time += float(time.time() - time1)
 
-                # start1 = time.time()
+                start1 = time.time()
                 p.stepSimulation()
                 if frame_draw_manager:
                     frame_draw_manager.update()
-                # step_sim_time += float(time.time() - start1)
+                step_sim_time += float(time.time() - start1)
                 if not quick_mode:
                     used_time = float(time.time() - start)
                     if used_time < 1.0 / self.simulation_freq:
@@ -233,8 +234,8 @@ class FetchRobot:
             settle_wait_time += float(time.time() - start_time)
 
             print(f'[pb_fetch.py] time record: '
-                  # f'\n IK {ik_time} \n Set control {set_control_time} '
-                  # f'\n Step cb {cb_time} \n Step sim {step_sim_time} '
+                  f'\n IK {ik_time} \n Set control {set_control_time} '
+                  f'\n Step cb {cb_time} \n Step sim {step_sim_time} '
                   f'\n Move {move_time} \n Settle {settle_wait_time}')
         except Exception as e:
             error_handler(e)
