@@ -1,7 +1,7 @@
 import gym
 import numpy as np
 from gym import spaces
-import pybullet as p
+import cv2
 import pybullet_data
 import os
 import sys
@@ -298,6 +298,7 @@ class FetchPushEnv(gym.Env):
         self.rgb_seq.append(rgb)
         self.depth_seq.append(depth)
         self.mask_seq.append(mask)
+        cv2.imwrite(f'snapshot{len(self.rgb_seq)}', rgb)
 
     def _remove_table(self):
         '''
