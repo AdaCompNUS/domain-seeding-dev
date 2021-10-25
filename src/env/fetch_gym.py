@@ -407,8 +407,9 @@ if __name__ == '__main__':
     exp_policy = ExplorationPolicy()
     prm_types, prm_argss = randomizer.sample(num_objects=1)
 
+    sim_mode = 'super'
     obs, info = env.reset(prm_types=prm_types, prm_argss=prm_argss, goal=TaskGoal(GType.BEYOND, [0, 1.0, 0.8]),
-                          reset_object=False, mode='super')
+                          reset_object=False, mode=sim_mode)
     # env.render()
     # # env.render()
     # start_time = time.time()
@@ -417,7 +418,8 @@ if __name__ == '__main__':
     # print(end_time - start_time)
 
     while True:
-        env.reset(reset_env=False, reset_object=True, reset_robot=True, reset_goal=False, need_return=False)
+        env.reset(reset_env=False, reset_object=True, reset_robot=True, reset_goal=False, need_return=False,
+                  mode=sim_mode)
         # env.render()
         start_time = time.time()
         _, reward, done, info2 = env.step(exp_policy.next_action(info['obj_state']), generate_obs=False)
