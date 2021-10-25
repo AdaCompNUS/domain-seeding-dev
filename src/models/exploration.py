@@ -27,6 +27,6 @@ class ExplorationPolicy:
         # end_euler = [0, 0, math.radians(90)]
         end_euler = [math.radians(90)]
 
-        ret = ParameterizedPolicy(x=start_pos + start_euler + end_pos + end_euler + [self.DURATION])
+        ret = ParameterizedPolicy(x=start_pos + start_euler + end_pos + end_euler)  #  + [self.DURATION])
         print('[pi_e] Chosen {}'.format(ret.text()))
         return ret
