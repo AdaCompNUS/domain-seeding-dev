@@ -408,7 +408,7 @@ if __name__ == '__main__':
     prm_types, prm_argss = randomizer.sample(num_objects=1)
 
     obs, info = env.reset(prm_types=prm_types, prm_argss=prm_argss, goal=TaskGoal(GType.BEYOND, [0, 1.0, 0.8]),
-                          reset_object=False, mode='normal')
+                          reset_object=False, mode='quick')
     # env.render()
     # # env.render()
     # start_time = time.time()
@@ -420,7 +420,7 @@ if __name__ == '__main__':
         env.reset(reset_env=False, reset_object=True, reset_robot=True, reset_goal=False, need_return=False)
         # env.render()
         start_time = time.time()
-        _, reward, done, info2 = env.step(exp_policy.next_action(info['obj_state']))
+        _, reward, done, info2 = env.step(exp_policy.next_action(info['obj_state']), generate_obs=False)
         end_time = time.time()
         print(end_time - start_time)
 
