@@ -393,7 +393,7 @@ class FetchPushEnv(gym.Env):
 
 
 if __name__ == '__main__':
-    env = FetchPushEnv(gui=True, logging_level=LOGGING_MIN)
+    env = FetchPushEnv(gui=False, logging_level=LOGGING_MIN)
     # env.render()
 
     logId = p.startStateLogging(p.STATE_LOGGING_PROFILE_TIMINGS, "timings")
