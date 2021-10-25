@@ -79,15 +79,17 @@ class TaskGoal:
 
 
 class ParameterizedPolicy():
-    dim = 9
+    dim = 8
     rad_scale = 1.0
     time_scale = 1.0
 
     def __init__(self, x):
         # Fix some components
+        assert(len(x) == self.dim)
         start_euler = self.rad_scale * (x[3] - math.radians(90)) + math.radians(90)
         end_eular = self.rad_scale * (x[7] - math.radians(90)) + math.radians(90)
-        duration = self.time_scale * (x[8] - 1.0) + 1.0
+        # duration = self.time_scale * (x[8] - 1.0) + 1.0
+        duration = 1.0
 
         self.start_pos = x[0:3]
         self.start_pos[2] = max(self.start_pos[2], 0.6)
@@ -111,7 +113,7 @@ class ParameterizedPolicy():
         end_euler = 1.0 / self.rad_scale * (self.end_euler[2] - math.radians(90)) + math.radians(90)
         duration = 1.0 / self.time_scale * (self.duration - 1.0) + 1.0
 
-        return self.start_pos + [start_euler] + self.end_pos + [end_euler] + [duration]
+        return self.start_pos + [start_euler] + self.end_pos + [end_euler]  # + [duration]
 
     def trans_dist(self):
         return math.sqrt((self.start_pos[0] - self.end_pos[0]) ** 2 +
