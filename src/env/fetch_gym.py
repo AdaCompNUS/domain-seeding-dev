@@ -7,6 +7,8 @@ import os
 import sys
 import time
 from pathlib import Path
+from pybullet_utils import bullet_client as bc
+
 
 ws_root = Path(os.path.realpath(__file__)).parent.parent
 print(f'workspace root: {ws_root}')
@@ -40,11 +42,15 @@ class FetchPushEnv(gym.Env):
     def __init__(self, gui=False, logging_level=LOGGING_MIN):
         super(FetchPushEnv, self).__init__()
 
+        self.pb_client = None
         # connect to pybullet engine
         if gui:
-            p.connect(p.GUI)  # no GUI
+            # p.connect(p.GUI)  # no GUI
+            self.pb_client = bc.BulletClient(connection_mode=p.GUI)
         else:
-            p.connect(p.DIRECT)  # no GUI
+            # p.connect(p.DIRECT)  # no GUI
+            self.pb_client = bc.BulletClient(connection_mode=p.DIRECT)
+
         p.setGravity(0, 0, -9.8)
         p.setTimeStep(1. / SIMULATION_FREQ)
         p.setRealTimeSimulation(0)
