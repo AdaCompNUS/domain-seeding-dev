@@ -238,7 +238,7 @@ class FetchRobot:
 
             print(f'[pb_fetch.py] time record: '
                   f'\n IK {ik_time} \n Set control {set_control_time} '
-                  f'\n Step cb {cb_time} \n Step sim {step_sim_time} '
+                  f'\n Step cb {cb_time} \n Step sim {step_sim_time} \n Sleep tim {sleep_time}'
                   f'\n Move {move_time} \n Settle {settle_wait_time}')
         except Exception as e:
             error_handler(e)
