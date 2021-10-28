@@ -11,7 +11,6 @@ import time
 from pathlib import Path
 from pybullet_utils import bullet_client as bc
 
-
 ws_root = Path(os.path.realpath(__file__)).parent.parent
 print(f'workspace root: {ws_root}')
 sys.stdout.flush()
@@ -38,7 +37,7 @@ class FetchPushEnv(gym.Env):
     NUM_OBS_FRAMES = int(CAMERA_FREQ * (ExplorationPolicy.DURATION + FetchRobot.SETTLE_DURATION))
     NUM_DEPTH_SEGMENTS = 2
     WS_RANGE = 10  # T.B.D
-    OBS_RES = 640  # T.B.D
+    OBS_RES = 120  # T.B.D
     MAX_DEPTH = 1.0  # T.B.D
 
     def __init__(self, gui=False, logging_level=LOGGING_MIN):
@@ -74,7 +73,8 @@ class FetchPushEnv(gym.Env):
                                       high=10.0,  # dummy value
                                       shape=(ObjState.DIM_PREDICTIONS,))  # A box in R^4. Each coordinate is bounded.
         self.observation_space = spaces.Box(low=0.0, high=self.MAX_DEPTH,
-                                            shape=(self.NUM_DEPTH_SEGMENTS * self.NUM_OBS_FRAMES, self.OBS_RES, self.OBS_RES),
+                                            shape=(
+                                            self.NUM_DEPTH_SEGMENTS * self.NUM_OBS_FRAMES, self.OBS_RES, self.OBS_RES),
                                             dtype=np.float32)  # depth image
 
         # robot
@@ -107,7 +107,7 @@ class FetchPushEnv(gym.Env):
         self.prm_types = None
         self.prm_argss = None
         self.logging_level = logging_level
-        self.frame_visualizer = FrameDrawManager()
+        self.frame_visualizer = None
 
     def print_with_level(self, msg, level=LOGGING_DEBUG):
         if self.logging_level >= level:
@@ -128,6 +128,8 @@ class FetchPushEnv(gym.Env):
                 if self.object:
                     del self.object
                 if self.mode == 'normal':
+                    if self.frame_visualizer:
+                        del self.frame_visualizer
                     self.frame_visualizer = FrameDrawManager()
                 '''
                 re-locate the table, allow for slight noise in position and orientation
@@ -159,7 +161,7 @@ class FetchPushEnv(gym.Env):
                         end = [goal.args[0] + goal.args[2] * math.cos(theta),
                                goal.args[1] + goal.args[2] * math.sin(theta), 0.51]
                         p.addUserDebugLine(start, end, lineColorRGB=[0, 1, 0], lineWidth=2.0, lifeTime=0,
-                                       physicsClientId=self.pb_client._client)
+                                           physicsClientId=self.pb_client._client)
                         last_theta = theta
 
             self.print_with_level('[fetch_gym.py] Reset robot', LOGGING_INFO)
@@ -269,6 +271,7 @@ class FetchPushEnv(gym.Env):
             obs = None
             if generate_obs:
                 obs = self._process_img_seq(self.depth_seq, self.mask_seq)  # get depth images as obs
+                self.print_with_level(f'[fetch_gym] Shape of generated obs {obs.shape}', LOGGING_MIN)
 
             if self.goal:
                 reward, succeed = self.reward_function(info['obj_state'], action)
@@ -375,6 +378,15 @@ class FetchPushEnv(gym.Env):
             obj_depth_seq[table_mask] = 1.0
             table_depth_seq[obj_mask] = 1.0
 
+            rescaled_obj_depth_seq = []
+            for i in range(len(obj_depth_seq)):
+                rescaled_obj_depth_seq.append(cv2.resize(obj_depth_seq[i], (self.OBS_RES, self.OBS_RES),
+                                              interpolation=cv2.INTER_AREA))
+
+            rescaled_robot_depth_seq = []
+            for i in range(len(robot_depth_seq)):
+                rescaled_robot_depth_seq.append(cv2.resize(robot_depth_seq[i], (self.OBS_RES, self.OBS_RES),
+                                                interpolation=cv2.INTER_AREA))
             # for i in range(0, 100, 10):
             #     sample = obj_depth_seq[i]
             #     cv2.imshow("tmp", sample)
@@ -392,13 +404,14 @@ class FetchPushEnv(gym.Env):
             #     cv2.destroyAllWindows()
 
             if len(depth_seq.shape) > 2:
-                assert(depth_seq.shape[0] == self.NUM_OBS_FRAMES)
-                ret = np.zeros((self.NUM_DEPTH_SEGMENTS * depth_seq.shape[0],
-                                depth_seq.shape[1], depth_seq.shape[2]), depth_seq.dtype)
-                for i in range(depth_seq.shape[0]):
-                    ret[2 * i:2 * (i + 1)] = np.array([robot_depth_seq[i], obj_depth_seq[i]])
+                num_frames = depth_seq.shape[0]
+                assert (num_frames == self.NUM_OBS_FRAMES)
+                ret = np.zeros((self.NUM_DEPTH_SEGMENTS * num_frames,
+                                self.OBS_RES, self.OBS_RES), depth_seq.dtype)
+                for i in range(num_frames):
+                    ret[2 * i:2 * (i + 1)] = np.array([rescaled_robot_depth_seq[i], rescaled_obj_depth_seq[i]])
             else:
-                ret = np.array([robot_depth_seq, obj_depth_seq])
+                ret = np.array([rescaled_robot_depth_seq, rescaled_obj_depth_seq])
             # return robot_depth_seq, table_depth_seq, obj_depth_seq
             return ret
         except Exception as e:
@@ -431,7 +444,7 @@ if __name__ == '__main__':
     exp_policy = ExplorationPolicy()
     prm_types, prm_argss = randomizer.sample(num_objects=1)
 
-    sim_mode = 'super'
+    sim_mode = 'quick'
     obs, info = env.reset(prm_types=prm_types, prm_argss=prm_argss, goal=TaskGoal(GType.WITHIN_CIRCLE, [0.2, 0.7, 0.1]),
                           reset_object=False, mode=sim_mode)
     # env.render()
@@ -446,7 +459,7 @@ if __name__ == '__main__':
                   mode=sim_mode)
         # env.render()
         start_time = time.time()
-        _, reward, done, info2 = env.step(exp_policy.next_action(info['obj_state']), generate_obs=False)
+        _, reward, done, info2 = env.step(exp_policy.next_action(info['obj_state']), generate_obs=True)
         end_time = time.time()
         print(f'Step time {end_time - start_time}')
 
