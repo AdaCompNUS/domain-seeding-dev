@@ -36,6 +36,16 @@ class PrimitiveRandomizer:
         assert (len(self.SEARCH_LB) == ObjState.DIM_PREDICTIONS)
         assert (len(self.SEARCH_UB) == ObjState.DIM_PREDICTIONS)
 
+    @staticmethod
+    def mean_params(p_type):
+        """Only considering scale (2), center of mass (3), mass (1), friction (1)"""
+        scale = [sum(x)/2.0 for x in zip(PrimitiveRandomizer.SHAPE_LB[p_type], PrimitiveRandomizer.SHAPE_UB[p_type])]
+        com = [0.0, 0.0, 0.0]
+        mass = (PrimitiveRandomizer.PHY_LB[0] + PrimitiveRandomizer.PHY_UB[0]) / 2.0
+        friction = (PrimitiveRandomizer.PHY_LB[1] + PrimitiveRandomizer.PHY_UB[1]) / 2.0
+
+        return ObjState.serialize_external(scale, com, mass, friction)
+
     def sample(self):
         # random.seed(30)
         p_type = self._sample_type()

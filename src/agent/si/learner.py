@@ -144,21 +144,21 @@ class SILearner(BaseOfflineAgent):
             start_time = time.time()
 
             self.model.train()
-            for i, (images, guess, label) in enumerate(self.train_loader):
+            for i, (images, guess, diff) in enumerate(self.train_loader):
                 self.steps += 1
-                images, guess, label = images.cuda(), guess.cuda(), label.cuda()
-                prediction = self.model(images, guess)
-                loss = self.loss(prediction, label)
+                images, guess, diff = images.cuda(), guess.cuda(), diff.cuda()
+                pred_diff = self.model(images, guess)
+                loss = self.loss(pred_diff, diff)
                 self.update_params(
                     self.optimizer, self.model, loss, self.grad_clip)
                 if self.steps % self.log_interval == 0:
-                    prediction = prediction.clone().detach()
+                    pred_diff = pred_diff.clone().detach()
                     loss = loss.clone().detach()
-                    error = torch.abs(label - prediction)
+                    error = torch.abs(diff - pred_diff)
                     cur_lr = self.optimizer.param_groups[0]['lr']
                     evars = []
                     for i in range(self.env.param_space.shape[0]):
-                        evars.append(explained_variance_score(label.cpu()[:, i], prediction.cpu()[:, i]))
+                        evars.append(explained_variance_score(diff.cpu()[:, i], pred_diff.cpu()[:, i]))
                     grad_norm = self.calc_grad_mag(self.model)
 
                     log_dict = {
@@ -167,8 +167,8 @@ class SILearner(BaseOfflineAgent):
                         'loss/evar1': evars[1],
                         # 'loss/evar2': evars[2],
                         'stats/lr': cur_lr,
-                        'stats/mean0': prediction[:, 0].mean().item(),
-                        'stats/mean1': prediction[:, 1].mean().item(),
+                        'stats/mean0': pred_diff[:, 0].mean().item(),
+                        'stats/mean1': pred_diff[:, 1].mean().item(),
                         # 'stats/mean2': prediction[:, 2].mean().item(),
                         'stats/max_error0': error[:, 0].max().item(),
                         'stats/max_error1': error[:, 1].max().item(),

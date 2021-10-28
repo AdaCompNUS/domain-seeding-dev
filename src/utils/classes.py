@@ -36,6 +36,7 @@ class PrimitiveState:
 
 
 class ObjState:
+    """scale (2), center of mass (3), mass (1), friction (1)"""
     DIM_PREDICTIONS = 7
 
     def __init__(self, p_states: List[PrimitiveState]):
@@ -46,11 +47,26 @@ class ObjState:
         self.com = p_states[0].com
         self.mass = sum([prm.mass for prm in p_states])
         self.friction = sum([prm.friction for prm in p_states]) / len(p_states)
+        # This assumes the object only has 1 primitive
+        self.type = p_states[0].type
 
     def serialize(self):
         res = self.scale + self.com + [self.mass, self.friction]
         assert(len(res) == self.DIM_PREDICTIONS)
         return res
+
+    @staticmethod
+    def serialize_external(scale, com, mass, friction):
+        return scale + com + [mass, friction]
+
+    @staticmethod
+    def distance(ref_param, param):
+        diff = [x0 - x1 for (x0, x1) in zip(ref_param, param)]
+        return ObjState.norm(diff)
+
+    @staticmethod
+    def norm(x):
+        return sum([abs(e) for e in x])
 
 
 class TaskGoal:

@@ -101,11 +101,12 @@ class LabelledMemory(Dataset):
         #     image = self.transform(image)
         image = torch.FloatTensor(image)
         label = torch.FloatTensor(label)
-        guess = label + torch.FloatTensor(
+        diff = torch.FloatTensor(
             np.random.uniform(low=PrimitiveRandomizer.SEARCH_LB, high=PrimitiveRandomizer.SEARCH_UB))
+        guess = label - diff
         # if self.target_transform:
         #     label = self.target_transform(label)
-        return image, guess, label
+        return image, guess, diff
 
     def __len__(self):
         return self._n
