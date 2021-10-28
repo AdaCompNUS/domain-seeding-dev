@@ -103,7 +103,7 @@ class LabelledMemory(Dataset):
         label = torch.FloatTensor(label)
         diff = torch.FloatTensor(
             np.random.uniform(low=PrimitiveRandomizer.SEARCH_LB, high=PrimitiveRandomizer.SEARCH_UB))
-        guess = label - diff
+        guess = label - diff  # diff is label - guess
         # if self.target_transform:
         #     label = self.target_transform(label)
         return image, guess, diff
