@@ -124,6 +124,13 @@ class FetchPushEnv(gym.Env):
             # else:
             #     p.setRealTimeSimulation(1)
 
+            self.print_with_level('[fetch_gym.py] Reset robot', LOGGING_INFO)
+            if reset_robot:
+                '''
+                reset robot to default pose
+                '''
+                self.robot.reset()
+
             self.print_with_level('[fetch_gym.py] Reset gym env', LOGGING_INFO)
             if reset_env:  # re-generate the scene
                 if self.object:
@@ -166,13 +173,6 @@ class FetchPushEnv(gym.Env):
                         p.addUserDebugLine(start, end, lineColorRGB=[0, 1, 0], lineWidth=2.0, lifeTime=0,
                                            physicsClientId=self.pb_client._client)
                         last_theta = theta
-
-            self.print_with_level('[fetch_gym.py] Reset robot', LOGGING_INFO)
-            if reset_robot:
-                '''
-                reset robot to default pose
-                '''
-                self.robot.reset()
 
             if mode == 'normal' and self.gui:
                 self.print_with_level('[fetch_gym.py] Reset frame visualizer', LOGGING_INFO)
