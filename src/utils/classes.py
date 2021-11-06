@@ -63,7 +63,7 @@ class PScale:
 
     def to_cemas(self):
         """To be used as part of init_x in CMA-ES"""
-        return self.values
+        return list(self.values)
 
     def refract(self):
         if self.p_type == PType.CYLINDER:
@@ -104,7 +104,7 @@ class PPos:
 
     def to_cemas(self):
         """To be used as part of init_x in CMA-ES"""
-        return self.values
+        return list(self.values)
 
     def refract(self):
         if self.p_type == PType.CYLINDER:
@@ -149,7 +149,7 @@ class POrientation:
 
     def to_cemas(self):
         """To be used as part of init_x in CMA-ES"""
-        return self.values
+        return list(self.values)
 
     def refract(self):
         if self.p_type == PType.CYLINDER:
@@ -208,7 +208,7 @@ class PCom:
         h_shift = self.values[0]
         v_shift = self.values[1]
         """To be used as part of init_x in CMA-ES"""
-        return [h_shift, v_shift]
+        return list([h_shift, v_shift])
 
     def refract(self):
         h_shift = self.values[0]
@@ -254,7 +254,7 @@ class PPhysics:
 
     def to_cemas(self):
         """To be used as part of init_x in CMA-ES"""
-        return self.values
+        return list(self.values)
 
     def refract(self):
         if self.p_type == PType.CYLINDER:
