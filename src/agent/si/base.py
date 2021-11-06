@@ -95,8 +95,6 @@ class BaseOfflineAgent:
 
     def update_memory(self, images, label):
         try:
-            print_flush(f'Image: {images}')
-            print_flush(f'Label: {label}')
             assert(images is not None)
             assert(label is not None)
             self.train_memory.append(images, label)

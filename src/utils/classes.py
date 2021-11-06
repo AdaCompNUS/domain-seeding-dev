@@ -6,6 +6,7 @@ from pyquaternion import Quaternion
 from numpy import random as random
 
 ''' Util classes '''
+from functions import error_handler
 
 
 class PType(Enum):
@@ -292,9 +293,14 @@ class ObjState:
         self.type = p_states[0].type
 
     def to_cmaes(self):
-        res = self.scale.to_cemas() + self.com.to_cemas() + [self.mass, self.friction]
-        assert (len(res) == self.DIM_PREDICTIONS)
-        return res
+        try:
+            res = self.scale.to_cemas() + self.com.to_cemas() + [self.mass, self.friction]
+            print(f'[class.py] self.scale.to_cemas():{self.scale.to_cemas()}, '
+                  f'self.com.to_cemas():{self.com.to_cemas()}')
+            assert (len(res) == self.DIM_PREDICTIONS)
+            return res
+        except Exception as e:
+            error_handler(e)
 
     @staticmethod
     def to_cmaes_external(scale: List[float], com: List[float], mass: float, friction: float):
