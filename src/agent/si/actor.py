@@ -101,7 +101,7 @@ class SIActor(BaseOfflineAgent):
 
             prm_types, prm_argss = self.sim_randomizer.sample(num_objects=self.num_objects)
             obs, info = self.env.reset(prm_types=prm_types, prm_argss=prm_argss, mode='quick')
-            obj_state = ObjState(info['obj_state'])
+            obj_state = info['obj_state']
 
             if obs is None:
                 log_flush(self.log_txt, 'Environment reset failed. Wasting episode')

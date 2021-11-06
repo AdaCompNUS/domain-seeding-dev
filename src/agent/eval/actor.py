@@ -45,7 +45,7 @@ class EvalActor:
         get the observation sequence"""
         _, info = self.real_env.reset(reset_env=False, reset_object=True, reset_robot=True,
                                    reset_goal=False, mode='quick')
-        obj_state = ObjState(info['obj_state'])
+        obj_state = info['obj_state']
         obs_seq, reward, succeed, info1 = self.real_env.step(self.exp_pi.next_action(obj_state))
 
         """Query the system identification model to guess the model parameters"""
@@ -63,7 +63,7 @@ class EvalActor:
         In reality, this can be different from the previous starting state"""
         _, info = self.real_env.reset(reset_env=False, reset_object=True, reset_robot=True,
                                       reset_goal=False, mode='quick')
-        obj_state = ObjState(info['obj_state'])
+        obj_state = info['obj_state']
 
         """Construct a new simulation according to the model parameters"""
         sim_env = FetchPushEnv(gui=False)
