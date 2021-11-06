@@ -19,10 +19,10 @@ class ExplorationPolicy:
             posx = 0.0
             posy = 0.7
         # start_pos = [posx, posy - obj_scale, 0.62]
-        start_pos = [posx, posy - obj_scale, 0.63]
+        start_pos = [posx, posy - obj_scale, 0.61]
         # start_euler = [0, 0, math.radians(90)]
         start_euler = [math.radians(90)]
-        end_pos = [posx, min(posy + 0.2, 1.3), 0.63]
+        end_pos = [posx, min(posy + 0.2, 1.3), 0.61]
         # end_pos = [posx, 0.8, 0.72]
         # end_euler = [0, 0, math.radians(90)]
         end_euler = [math.radians(90)]

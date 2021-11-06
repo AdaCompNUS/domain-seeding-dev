@@ -366,14 +366,16 @@ class ParameterizedPolicy():
         end_eular = self.rad_scale * (x[7] - math.radians(90)) + math.radians(90)
         # duration = self.time_scale * (x[8] - 1.0) + 1.0
         duration = 1.0
+        tilt_x = 0.0
+        tilt_y = math.pi / 20
 
         self.start_pos = x[0:3]
         self.start_pos[2] = max(self.start_pos[2], 0.6)
-        self.start_euler = [0.0, 0.0, start_euler]  # x[3:6]
+        self.start_euler = [tilt_x, tilt_y, start_euler]  # x[3:6]
         self.start_ori = p.getQuaternionFromEuler(self.start_euler)
         self.end_pos = x[4:7]  # x[6:9]
         self.end_pos[2] = max(self.end_pos[2], 0.6)
-        self.end_euler = [0.0, 0.0, end_eular]  # x[9:12]
+        self.end_euler = [tilt_x, tilt_y, end_eular]  # x[9:12]
         self.end_ori = p.getQuaternionFromEuler(self.end_euler)
         self.duration = duration  # x[12]
 
