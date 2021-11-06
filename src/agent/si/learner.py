@@ -7,6 +7,7 @@ from pathlib import Path
 import Pyro4
 import sys
 from tqdm import tqdm
+from colorama import Fore
 
 ws_root = Path(os.path.realpath(__file__)).parent.parent.parent
 print(f'workspace root: {ws_root}')
@@ -145,7 +146,9 @@ class SILearner(BaseOfflineAgent):
             log_flush(self.log_txt, 'Learning for epoch {}'.format(self.epochs))
             start_time = time.time()
 
-            p_bar = tqdm(total=len(self.train_memory), colour='#004e96')
+            p_bar = tqdm(total=len(self.train_memory))
+            p_bar.bar_format = "{l_bar}%s{bar}%s{r_bar}" % ("#004e96", Fore.RESET)
+
             train_loss = AverageMeter()
 
             self.model.train()
@@ -200,7 +203,8 @@ class SILearner(BaseOfflineAgent):
         try:
             log_flush(self.log_txt, 'Evaluating for epoch {}'.format(self.epochs))
             val_loss = AverageMeter()
-            p_bar = tqdm(total=len(self.test_memory), colour="#154160")
+            p_bar = tqdm(total=len(self.test_memory))
+            p_bar.bar_format = "{l_bar}%s{bar}%s{r_bar}" % ("#154160", Fore.RESET)
 
             self.model.eval()
             for i, (images, guess, label) in enumerate(self.validation_loader):
