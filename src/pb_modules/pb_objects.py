@@ -45,7 +45,8 @@ class Primitive:
                 self.scale = args[0:1]
 
             elif type == PType.CYLINDER:
-                self.scale = args['scale']
+                print(args.keys())
+                self.scale = args['shape']
                 radius, length = self.scale.to_prm_params()
                 self.init_pos = args['pos']
                 pos = self.init_pos.to_prm_params()

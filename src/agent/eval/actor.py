@@ -71,7 +71,7 @@ class EvalActor:
         p_type = obj_state.type
         p_args['pos'] = PPos(obj_state.pos, p_type)
         p_args['rot'] = POrientation.from_quaternion(obj_state.quaternion, p_type)
-        p_args['scale'], p_args['com'], p_args['phy'] = PrimitiveRandomizer.refract_cemas_params(param_pred, p_type)
+        p_args['shape'], p_args['com'], p_args['phy'] = PrimitiveRandomizer.refract_cemas_params(param_pred, p_type)
         obs, info = sim_env.reset(prm_types=[p_type], prm_argss=[p_args], mode='quick')
 
         """Policy search using CMA-ES"""
