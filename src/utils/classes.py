@@ -98,6 +98,15 @@ class PPos:
         pos_args[2] += radius  # shift above the surface of the table
         return PPos(pos_args, p_type)
 
+    @staticmethod
+    def default(p_type: PType, radius: float):
+        if p_type != PType.CYLINDER:
+            raise Exception("Unsupported primitive type for PPos at [classes.py]")
+        """Take mean over the bounds"""
+        pos_args = [sum(x) / 2.0 for x in zip(PPos.LB, PPos.UB)]
+        pos_args[2] += radius  # shift above the surface of the table
+        return PPos(pos_args, p_type)
+
     def to_prm_params(self):
         """To construct the primitive"""
         return self.values
@@ -135,6 +144,13 @@ class POrientation:
             raise Exception("Unsupported primitive type for POrientation at [classes.py]")
 
         rad_z = math.radians(random.uniform(-180.0, 180.0))
+        return POrientation([rad_z], p_type)
+
+    @staticmethod
+    def default(p_type: PType):
+        if p_type != PType.CYLINDER:
+            raise Exception("Unsupported primitive type for POrientation at [classes.py]")
+        rad_z = 0.0
         return POrientation([rad_z], p_type)
 
     @staticmethod

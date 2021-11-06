@@ -447,9 +447,9 @@ if __name__ == '__main__':
 
     randomizer = ObjectRandomizer()
     exp_policy = ExplorationPolicy()
-    prm_types, prm_argss = randomizer.sample(num_objects=1)
+    prm_types, prm_argss = randomizer.sample_for_explore(num_objects=1)
 
-    sim_mode = 'normal'
+    sim_mode = 'quick'
     obs, info = env.reset(prm_types=prm_types, prm_argss=prm_argss, goal=TaskGoal(GType.WITHIN_CIRCLE, [0.2, 0.7, 0.1]),
                           reset_object=False, mode=sim_mode)
     # env.render()
@@ -462,8 +462,8 @@ if __name__ == '__main__':
     while True:
         # env.reset(reset_env=False, reset_object=True, reset_robot=True, reset_goal=False, need_return=False,
                   # mode=sim_mode)
-        prm_types, prm_argss = randomizer.sample(num_objects=1)
-        obs, info = env.reset(prm_types=prm_types, prm_argss=prm_argss,
+        prm_types, prm_argss = randomizer.sample_for_explore(num_objects=1)
+        _, info = env.reset(prm_types=prm_types, prm_argss=prm_argss,
                               goal=TaskGoal(GType.WITHIN_CIRCLE, [0.2, 0.7, 0.1]),
                               reset_object=False, mode=sim_mode)
         # env.render()
@@ -475,6 +475,6 @@ if __name__ == '__main__':
         # print(info1['obj_state'].pos, info1['obj_state'].quaternion)
         # print(info2['obj_state'].pos, info2['obj_state'].quaternion)
         # env.render()
-        input()
+        # input()
 
     p.stopStateLogging(logId)

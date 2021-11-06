@@ -36,6 +36,27 @@ class PrimitiveRandomizer:
 
         return scale, com, physics
 
+    def sample_for_explore(self):
+        # random.seed(30)
+        p_args = {
+            'shape': None,
+            'pos': None,
+            'rot': None,
+            'com': None,
+            'phy': None
+        }
+        p_type = self._sample_type()
+        shape_obj = PScale.uniform(p_type)
+        radius, length = shape_obj.refract()
+        p_args['shape'] = shape_obj
+        p_args['com'] = PCom.uniform(shape_obj, p_type)
+        p_args['phy'] = PPhysics.uniform(p_type)
+
+        p_args['pos'] = PPos.default(p_type, radius)
+        p_args['rot'] = POrientation.default(p_type)
+
+        return p_type, p_args
+
     def sample(self):
         # random.seed(30)
         p_args = {
@@ -71,9 +92,13 @@ class ObjectRandomizer:
             p_type, p_args = self.randomizer.sample()
             prm_types.append(p_type)
             prm_argss.append(p_args)
-        # print('[dr] randomize object configuration:\n  types {}'.format(prm_types))
-        # print('[dr] args\n  radius {}\n  length {}\n  pos {}\n  quat {}'.format(
-        #     prm_argss[0][0], prm_argss[0][1],
-        #     prm_argss[0][2:5], prm_argss[0][5:9]
-        # ))
+        return prm_types, prm_argss
+
+    def sample_for_explore(self, num_objects):
+        prm_argss = []
+        prm_types = []
+        for i in range(num_objects):
+            p_type, p_args = self.randomizer.sample_for_explore()
+            prm_types.append(p_type)
+            prm_argss.append(p_args)
         return prm_types, prm_argss

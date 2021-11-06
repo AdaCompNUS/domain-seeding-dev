@@ -23,7 +23,8 @@ LOAD_PATH = ws_root / 'trained_models'
 
 
 class EvalActor:
-    def __init__(self, env, cuda=True, si_model_name="si.pth", logging_level=LOGGING_MIN):
+    def __init__(self, env, cuda=True, si_model_name="si.pth", logging_level=LOGGING_MIN,
+                 seed=None, aid=0, render=True):
         self.real_env = env
         self.device = torch.device(
             "cuda" if cuda and torch.cuda.is_available() else "cpu")
@@ -66,7 +67,7 @@ class EvalActor:
         obj_state = info['obj_state']
 
         """Construct a new simulation according to the model parameters"""
-        sim_env = FetchPushEnv(gui=False)
+        sim_env = FetchPushEnv(gui=True)
         p_args = {}
         p_type = obj_state.type
         p_args['pos'] = PPos(obj_state.pos, p_type)
@@ -90,3 +91,31 @@ class EvalActor:
             print('Conducting best policy')
             self.real_env.step(action=ParameterizedPolicy(x=ret))
             input()
+
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--aid',
+                        type=int,
+                        default=0,
+                        help='actor_id')
+    parser.add_argument('--seed', type=int, default=0)
+    args = parser.parse_args()
+
+    use_data = False
+    with FetchPushEnv(gui=True) as fetch_env:
+        config = {
+            'env': fetch_env,
+            'cuda': True,
+            'render': True,
+            'actor_id': args.aid,
+            'seed': args.seed,
+            'si_model_name': "si.pth",
+            'logging_level': LOGGING_MIN
+        }
+
+        actor = EvalActor(**config)
+        actor.run()
+
+    print_flush('[actor.py] termination')

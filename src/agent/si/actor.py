@@ -99,7 +99,7 @@ class SIActor(BaseOfflineAgent):
             episode_steps = 0
             episode_done = False
 
-            prm_types, prm_argss = self.sim_randomizer.sample(num_objects=self.num_objects)
+            prm_types, prm_argss = self.sim_randomizer.sample_for_explore(num_objects=self.num_objects)
             obs, info = self.env.reset(prm_types=prm_types, prm_argss=prm_argss, mode='quick')
             obj_state = info['obj_state']
 
