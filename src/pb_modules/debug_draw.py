@@ -196,6 +196,9 @@ class FrameDrawManager:
     def __init__(self):
         self.line_indices = dict()
 
+    def reset(self):
+        self.line_indices = dict()
+
     def _add_frame(self, frame: Frame, body_unique_id: int, link_index: int):
         # Workaround for the following problem:
         # When too many lines are added within a short period of time, the following error can occur

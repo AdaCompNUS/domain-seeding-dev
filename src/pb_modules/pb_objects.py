@@ -45,11 +45,10 @@ class Primitive:
                 self.scale = args[0:1]
 
             elif type == PType.CYLINDER:
-                print(args.keys())
                 self.scale = args['shape']
                 radius, length = self.scale.to_prm_params()
-                self.init_pos = args['pos']
-                pos = self.init_pos.to_prm_params()
+                self.ini_pos = args['pos']
+                pos = self.ini_pos.to_prm_params()
                 self.ini_ori = args['rot']
                 quaternion = self.ini_ori.to_prm_params()
                 self.com = args['com']
@@ -110,8 +109,9 @@ class Primitive:
 
     def reset(self):
         try:
-            # print(f'[pb_object.py] Resetting primitive {self.id} to {self.ini_pos} {self.ini_ori}')
-            p.resetBasePositionAndOrientation(self.id, self.ini_pos, self.ini_ori)
+            print(f'[pb_object.py] Resetting primitive {self.id} to '
+                  f'{self.ini_pos.to_prm_params()} {self.ini_ori.to_prm_params()}')
+            p.resetBasePositionAndOrientation(self.id, self.ini_pos.to_prm_params(), self.ini_ori.to_prm_params())
             p.resetBaseVelocity(self.id, [0.0, 0.0, 0.0], [0.0, 0.0, 0.0])
         except Exception as e:
             error_handler(e)
@@ -142,6 +142,7 @@ class Object:
 
     def reset(self):
         try:
+            print(f'[pb_object.py] Resetting object with primitives {self.primitives}')
             for primitive in self.primitives:
                 primitive.reset()
         except Exception as e:

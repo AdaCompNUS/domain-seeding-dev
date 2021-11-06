@@ -50,14 +50,17 @@ class FetchRobot:
             print(msg)
 
     def reset(self):
-        # self.fetch.robot_specific_reset() # reset arm joint positions
-        home_arm_positions = (
-            0.383, -0.5277115733278102, 1.1416475129889028, 3.1555377149919033, -1.1435719512665534,
-            2.4627678231156582, -2.1644855078770386, -0.42874708820913476)
-        # home_arm_positions = (0.3812102776278893, -0.5277115733278102, 1.1416475129889028, 3.1555377149919033,
-        # -1.1435719512665534, 2.4627678231156582, -2.1644855078770386, -0.42874708820913476)
-        self.set_arm_joint_positions(home_arm_positions)
-        self.set_base_pose([0, 0, 0], p.getQuaternionFromEuler([0, 0, math.radians(90)]))  # reset base positions
+        try:
+            # self.fetch.robot_specific_reset() # reset arm joint positions
+            home_arm_positions = (
+                0.383, -0.5277115733278102, 1.1416475129889028, 3.1555377149919033, -1.1435719512665534,
+                2.4627678231156582, -2.1644855078770386, -0.42874708820913476)
+            # home_arm_positions = (0.3812102776278893, -0.5277115733278102, 1.1416475129889028, 3.1555377149919033,
+            # -1.1435719512665534, 2.4627678231156582, -2.1644855078770386, -0.42874708820913476)
+            self.set_arm_joint_positions(home_arm_positions)
+            self.set_base_pose([0, 0, 0], p.getQuaternionFromEuler([0, 0, math.radians(90)]))  # reset base positions
+        except Exception as e:
+            error_handler(e)
 
     def set_base_pose(self, pos, orientation):
         self.fetch.set_position(pos)

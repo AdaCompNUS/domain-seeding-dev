@@ -27,7 +27,7 @@ from simulation.domain_randomization import ObjectRandomizer, PrimitiveRandomize
 from models.exploration import ExplorationPolicy
 
 # ------- Settings ----------
-SIMULATION_FREQ = 60
+SIMULATION_FREQ = 120
 CAMERA_FREQ = 3  # Due to the speed of getCameraImage, this has to be slower than 20Hz depending on the machine
 
 
@@ -128,9 +128,11 @@ class FetchPushEnv(gym.Env):
             if reset_env:  # re-generate the scene
                 if self.object:
                     del self.object
-                if self.mode == 'normal':
-                    if self.frame_visualizer:
-                        del self.frame_visualizer
+
+                if self.frame_visualizer:
+                    self.frame_visualizer.reset()
+                    p.removeAllUserDebugItems()
+                elif self.mode == 'normal':
                     self.frame_visualizer = FrameDrawManager()
                 '''
                 re-locate the table, allow for slight noise in position and orientation
@@ -173,10 +175,12 @@ class FetchPushEnv(gym.Env):
                 self.robot.reset()
 
             if mode == 'normal' and self.gui:
+                self.print_with_level('[fetch_gym.py] Reset frame visualizer', LOGGING_INFO)
                 self.frame_visualizer.add_inertial_frame(self.object.primitives[0].id, -1)
-                self.frame_visualizer.add_collision_frame(self.object.primitives[0].id, -1)
+                # self.frame_visualizer.add_collision_frame(self.object.primitives[0].id, -1)
 
             if need_return:
+                self.print_with_level('[fetch_gym.py] Generating return', LOGGING_INFO)
                 info = {}
                 info['obj_state'] = self.object.get_states()  # get true object state from simulator
 
@@ -445,7 +449,7 @@ if __name__ == '__main__':
     exp_policy = ExplorationPolicy()
     prm_types, prm_argss = randomizer.sample(num_objects=1)
 
-    sim_mode = 'quick'
+    sim_mode = 'normal'
     obs, info = env.reset(prm_types=prm_types, prm_argss=prm_argss, goal=TaskGoal(GType.WITHIN_CIRCLE, [0.2, 0.7, 0.1]),
                           reset_object=False, mode=sim_mode)
     # env.render()
@@ -456,8 +460,12 @@ if __name__ == '__main__':
     # print(end_time - start_time)
 
     while True:
-        env.reset(reset_env=False, reset_object=True, reset_robot=True, reset_goal=False, need_return=False,
-                  mode=sim_mode)
+        # env.reset(reset_env=False, reset_object=True, reset_robot=True, reset_goal=False, need_return=False,
+                  # mode=sim_mode)
+        prm_types, prm_argss = randomizer.sample(num_objects=1)
+        obs, info = env.reset(prm_types=prm_types, prm_argss=prm_argss,
+                              goal=TaskGoal(GType.WITHIN_CIRCLE, [0.2, 0.7, 0.1]),
+                              reset_object=False, mode=sim_mode)
         # env.render()
         start_time = time.time()
         _, reward, done, info2 = env.step(exp_policy.next_action(info['obj_state']), generate_obs=True)

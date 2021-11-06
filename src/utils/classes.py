@@ -94,8 +94,8 @@ class PPos:
         if p_type != PType.CYLINDER:
             raise Exception("Unsupported primitive type for PPos at [classes.py]")
         pos_args = list(random.uniform(low=PPos.LB, high=PPos.UB))
-        height = pos_args[2]
-        pos_args[2] = max(height, table_height + radius + 0.001)  # shift above the surface of the table
+        # height = pos_args[2]
+        pos_args[2] += radius  # shift above the surface of the table
         return PPos(pos_args, p_type)
 
     def to_prm_params(self):
@@ -161,7 +161,6 @@ class POrientation:
 
 class PCom:
     """A class for managing different representations of center of mass
-    h_shift
     """
     LB = [-PScale.UB[PType.CYLINDER][1] / 2.0, 0.0]
     UB = [PScale.UB[PType.CYLINDER][1] / 2.0, PScale.UB[PType.CYLINDER][0]]
@@ -187,33 +186,31 @@ class PCom:
         radius = scale.values[0]
         length = scale.values[1]
         if p_type == PType.CYLINDER:
-            v_shift = random.uniform(-length / 2.0, length / 2.0)
-            h_shift = random.uniform(0, radius)
-            return PCom([h_shift, v_shift], p_type)
+            shift_around = random.uniform(0, radius)
+            shift_along = random.uniform(-length / 2.0, length / 2.0)
+            return PCom([shift_along, shift_around], p_type)
         else:
             raise Exception("Unsupported primitive type for COM at [classes.py]")
 
     @staticmethod
-    def shift_to_prm_params(h_shift: float, v_shift: float):
+    def shift_to_prm_params(shift_along: float, shift_around: float):
         """To construct the primitive"""
-        return [v_shift, 0.0, h_shift]
+        return [shift_around, 0.0, shift_along]
 
     def to_prm_params(self):
         """To construct the primitive"""
-        h_shift = self.values[0]
-        v_shift = self.values[1]
-        return [v_shift, 0.0, h_shift]
+        shift_along = self.values[0]
+        shift_around = self.values[1]
+        return [shift_around, 0.0, shift_along]
 
     def to_cemas(self):
-        h_shift = self.values[0]
-        v_shift = self.values[1]
         """To be used as part of init_x in CMA-ES"""
-        return list([h_shift, v_shift])
+        return list(self.values)
 
     def refract(self):
-        h_shift = self.values[0]
-        v_shift = self.values[1]
-        return h_shift, v_shift
+        shift_along = self.values[0]
+        shift_around = self.values[1]
+        return shift_along, shift_around
 
 
 class PPhysics:
@@ -295,8 +292,8 @@ class ObjState:
     def to_cmaes(self):
         try:
             res = self.scale.to_cemas() + self.com.to_cemas() + [self.mass, self.friction]
-            print(f'[class.py] self.scale.to_cemas():{self.scale.to_cemas()}, '
-                  f'self.com.to_cemas():{self.com.to_cemas()}, res:{res}')
+            # print(f'[class.py] self.scale.to_cemas():{self.scale.to_cemas()}, '
+            #       f'self.com.to_cemas():{self.com.to_cemas()}, res:{res}')
             assert (len(res) == self.DIM_PREDICTIONS)
             return res
         except Exception as e:
