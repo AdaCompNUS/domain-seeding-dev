@@ -296,7 +296,7 @@ class ObjState:
         try:
             res = self.scale.to_cemas() + self.com.to_cemas() + [self.mass, self.friction]
             print(f'[class.py] self.scale.to_cemas():{self.scale.to_cemas()}, '
-                  f'self.com.to_cemas():{self.com.to_cemas()}')
+                  f'self.com.to_cemas():{self.com.to_cemas()}, res:{res}')
             assert (len(res) == self.DIM_PREDICTIONS)
             return res
         except Exception as e:
