@@ -145,7 +145,7 @@ class SILearner(BaseOfflineAgent):
             log_flush(self.log_txt, 'Learning for epoch {}'.format(self.epochs))
             start_time = time.time()
 
-            p_bar = tqdm(total=len(self.train_loader))
+            p_bar = tqdm(total=len(self.train_memory))
             train_loss = AverageMeter()
 
             self.model.train()
@@ -200,7 +200,7 @@ class SILearner(BaseOfflineAgent):
         try:
             log_flush(self.log_txt, 'Evaluating for epoch {}'.format(self.epochs))
             val_loss = AverageMeter()
-            p_bar = tqdm(total=len(self.validation_loader))
+            p_bar = tqdm(total=len(self.test_memory))
 
             self.model.eval()
             for i, (images, guess, label) in enumerate(self.validation_loader):
