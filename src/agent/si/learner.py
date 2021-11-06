@@ -158,7 +158,7 @@ class SILearner(BaseOfflineAgent):
                     self.optimizer, self.model, loss, self.grad_clip)
 
                 train_loss.update(torch.mean(loss).detach())
-                p_bar.set_description(f'Epoch {self.epochs} - loss {train_loss.avg:.4f}')
+                p_bar.set_description(f'Epoch {self.epochs} - train loss {train_loss.avg:.4f}')
                 p_bar.update(images.shape[0])
 
                 if self.steps % self.log_interval == 0:
@@ -211,7 +211,7 @@ class SILearner(BaseOfflineAgent):
                     loss = self.loss(prediction, label)
                     val_loss.update(torch.mean(loss).detach())
 
-                    p_bar.set_description(f'Epoch {self.epochs} - loss {val_loss.avg:.4f}')
+                    p_bar.set_description(f'Epoch {self.epochs} - val loss {val_loss.avg:.4f}')
                     p_bar.update(images.shape[0])
 
                     if self.steps % self.log_interval == 0:
