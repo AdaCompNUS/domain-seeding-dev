@@ -6,7 +6,7 @@ from pyquaternion import Quaternion
 from numpy import random as random
 
 ''' Util classes '''
-from functions import error_handler
+from utils.functions import error_handler
 
 
 class PType(Enum):
