@@ -6,6 +6,7 @@ from torch.optim import AdamW
 from pathlib import Path
 import Pyro4
 import sys
+from tqdm import tqdm
 
 ws_root = Path(os.path.realpath(__file__)).parent.parent.parent
 print(f'workspace root: {ws_root}')
@@ -15,6 +16,7 @@ sys.path.append(str(ws_root))
 
 from utils.functions import print_flush, log_flush, error_handler_with_log, explained_variance_score
 from utils.variables import data_host, log_port, replay_port
+from utils.classes import AverageMeter
 from models.si_model import ISModel
 from memory.labelled import LabelledMemory
 
@@ -143,6 +145,9 @@ class SILearner(BaseOfflineAgent):
             log_flush(self.log_txt, 'Learning for epoch {}'.format(self.epochs))
             start_time = time.time()
 
+            p_bar = tqdm(total=len(self.train_loader))
+            train_loss = AverageMeter()
+
             self.model.train()
             for i, (images, guess, diff) in enumerate(self.train_loader):
                 self.steps += 1
@@ -151,6 +156,11 @@ class SILearner(BaseOfflineAgent):
                 loss = self.loss(pred_diff, diff)
                 self.update_params(
                     self.optimizer, self.model, loss, self.grad_clip)
+
+                train_loss.update(torch.mean(loss).detach())
+                p_bar.set_description(f'Epoch {self.epochs} - loss {train_loss.avg:.4f}')
+                p_bar.update(images.shape[0])
+
                 if self.steps % self.log_interval == 0:
                     pred_diff = pred_diff.clone().detach()
                     loss = loss.clone().detach()
@@ -189,6 +199,9 @@ class SILearner(BaseOfflineAgent):
     def evaluate(self):
         try:
             log_flush(self.log_txt, 'Evaluating for epoch {}'.format(self.epochs))
+            val_loss = AverageMeter()
+            p_bar = tqdm(total=len(self.validation_loader))
+
             self.model.eval()
             for i, (images, guess, label) in enumerate(self.validation_loader):
                 self.steps += 1
@@ -196,6 +209,10 @@ class SILearner(BaseOfflineAgent):
                 with torch.no_grad():
                     prediction = self.model(images, guess)
                     loss = self.loss(prediction, label)
+                    val_loss.update(torch.mean(loss).detach())
+
+                    p_bar.set_description(f'Epoch {self.epochs} - loss {val_loss.avg:.4f}')
+                    p_bar.update(images.shape[0])
 
                     if self.steps % self.log_interval == 0:
                         prediction = prediction.clone().detach()
@@ -221,6 +238,8 @@ class SILearner(BaseOfflineAgent):
                             'progress/epoch': self.epochs,
                         }
                         self.logging_service.add_log(self.log_interval, self.log_flag_val, log_dict)
+            self.scheduler.step(val_loss.avg)
+
         except Exception as e:
             error_handler_with_log(self.log_txt, e)
 
