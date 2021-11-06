@@ -4,7 +4,7 @@ from torch.utils.data import Dataset
 from torchvision import transforms
 from torchvision.transforms import *
 from utils.functions import error_handler
-from random_sim.domain_randomization import PrimitiveRandomizer
+from simulation.domain_randomization import PrimitiveRandomizer
 import sys
 
 

@@ -9,6 +9,7 @@ import os
 import sys
 import time
 from pathlib import Path
+from typing import Dict
 from pybullet_utils import bullet_client as bc
 
 ws_root = Path(os.path.realpath(__file__)).parent.parent
@@ -22,7 +23,7 @@ from utils.functions import error_handler
 from pb_modules.pb_fetch import FetchRobot
 from pb_modules.pb_objects import Object
 from pb_modules.debug_draw import FrameDrawManager
-from random_sim.domain_randomization import ObjectRandomizer, PrimitiveRandomizer
+from simulation.domain_randomization import ObjectRandomizer, PrimitiveRandomizer
 from models.exploration import ExplorationPolicy
 
 # ------- Settings ----------
@@ -114,7 +115,7 @@ class FetchPushEnv(gym.Env):
             print(msg)
 
     def reset(self, mode='normal', reset_env=True, reset_object=False, reset_robot=True, reset_goal=True,
-              prm_types: List[PType] = None, prm_argss: List[List[float]] = None, goal: TaskGoal = None,
+              prm_types: List[PType] = None, prm_argss: List[Dict] = None, goal: TaskGoal = None,
               need_return=True):
         try:
             self.mode = mode

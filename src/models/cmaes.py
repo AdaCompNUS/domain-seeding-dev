@@ -15,7 +15,7 @@ from utils.variables import LOGGING_INFO, LOGGING_MIN, LOGGING_DEBUG
 from utils.classes import ParameterizedPolicy
 from env.fetch_gym import FetchPushEnv
 from models.exploration import ExplorationPolicy
-from random_sim.domain_randomization import PrimitiveRandomizer
+from simulation.domain_randomization import PrimitiveRandomizer
 
 
 trial = 0
@@ -92,7 +92,7 @@ def f(x):
 
 
 if __name__ == '__main__':
-    from random_sim.domain_randomization import ObjectRandomizer
+    from simulation.domain_randomization import ObjectRandomizer
     from utils.classes import TaskGoal, GType
 
     env = FetchPushEnv(gui=False, logging_level=LOGGING_MIN)
@@ -110,9 +110,9 @@ if __name__ == '__main__':
     env.step(action=init_policy.next_action(info['obj_state']))
     # input()
 
-    print(f"Initial action {init_policy.next_action(info['obj_state']).serialize()}")
+    print(f"Initial action {init_policy.next_action(info['obj_state']).to_cmaes()}")
     policy = CMA_ES(env=env, policy_class=ParameterizedPolicy, pop_size=50, end_iter=50,
-                    init_x=init_policy.next_action(info['obj_state']).serialize(), logging_level=LOGGING_MIN)
+                    init_x=init_policy.next_action(info['obj_state']).to_cmaes(), logging_level=LOGGING_MIN)
     ret = policy.search()
     # input()
 

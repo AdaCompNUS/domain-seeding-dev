@@ -11,7 +11,7 @@ class ExplorationPolicy:
 
     def next_action(self, state: ObjState):
         if state:
-            obj_scale = max(state.scale) + 0.05
+            obj_scale = max(state.scale.values) + 0.05
             posx = state.pos[0]
             posy = state.pos[1]
         else:

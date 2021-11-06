@@ -1,12 +1,12 @@
 import math
-
+from typing import Dict
 from utils.classes import *
 from utils.functions import error_handler
 import pybullet as p
 
 
 class Primitive:
-    def __init__(self, type: PType, args: List[float]):
+    def __init__(self, type: PType, args: Dict):
         self.id = None
         self.scale = None
         self.ini_ori, self.ini_pos = None, None
@@ -44,45 +44,30 @@ class Primitive:
             self.scale = args[0:1]
 
         elif type == PType.CYLINDER:
-            radius = args[0]
-            length = args[1]
-            pos_x = args[2]
-            pos_y = args[3]
-            pos_z = args[4]
-            quaternion = args[5:9]
-            com_angle = args[9]
-            com_dist = args[10]
-            com_height = args[11]
-            self.com = [com_dist * math.cos(com_angle), com_dist * math.sin(com_angle), com_height]
-            self.mass = args[12]
-            self.friction = args[13]
-            self.ini_pos = [pos_x, pos_y, pos_z]
-            self.ini_ori = quaternion
-            self.scale = [radius, length]
-            # linkMasses = [1.0]
-            # linkCollisionShapeIndices = [-1]
-            # linkVisualShapeIndices = [-1]
-            # linkPositions = [[0, 0, 0]]
-            # linkOrientations = [[0, 0, 0]]
-            # linkInertialFramePositions = [[0, 0, 0]]
-            # linkInertialFrameOrientations = [[0, 0, 0]]
-            # linkParentIndices = [-1]
-            # linkJointTypes = [p.JOINT_FIXED]
-            # linkJointAxis = [[0, 0, 0]]
+            self.scale = args['scale']
+            radius, length = self.scale.to_prm_params()
+            self.init_pos = args['pos']
+            pos = self.init_pos.to_prm_params()
+            self.ini_ori = args['rot']
+            quaternion = self.ini_ori.to_prm_params()
+            self.com = args['com']
+            com = self.com.to_prm_params()
+            self.physics = args['phy']
+            mass, friction = self.physics.to_prm_params()
             '''
             spawn a cylinder
             '''
             print(f'[pb_objects.py] Object info: \n'
                   f'  Type: cylinder \n'
                   f'  Shape: [{radius}, {length}]\n'
-                  f'  Pose: {self.ini_pos}, {self.ini_ori}\n'
-                  f'  Physics: {self.com}, {self.mass}, {self.friction}')
+                  f'  Pose: {pos}, {quaternion}\n'
+                  f'  Physics: {com}, {mass}, {friction}')
             colBoxId = p.createCollisionShape(p.GEOM_CYLINDER, radius=radius, height=length,
                                               collisionFramePosition=[0, 0, 0])
-            self.id = p.createMultiBody(baseMass=self.mass, baseCollisionShapeIndex=colBoxId,
-                                        basePosition=self.ini_pos, baseOrientation=self.ini_ori,
-                                        baseInertialFramePosition=self.com)
-            p.changeDynamics(self.id, -1, lateralFriction=self.friction)
+            self.id = p.createMultiBody(baseMass=mass, baseCollisionShapeIndex=colBoxId,
+                                        basePosition=pos, baseOrientation=quaternion,
+                                        baseInertialFramePosition=com)
+            p.changeDynamics(self.id, -1, lateralFriction=friction)
 
         elif type == PType.ELLIPSOID:
             radius_x = args[0]
@@ -134,7 +119,7 @@ class Primitive:
 
 
 class Object:
-    def __init__(self, types: List[PType], argss: List[List[float]]):
+    def __init__(self, types: List[PType], argss: List[Dict]):
         self.primitives = []
         if types is not None:
             for i in range(len(types)):
@@ -163,7 +148,7 @@ class Object:
         for primitive in self.primitives:
             pos, orientation = p.getBasePositionAndOrientation(primitive.id)
             p_states.append(PrimitiveState(primitive.id, primitive.type, primitive.scale, pos, orientation,
-                                           primitive.com, primitive.mass, primitive.friction))
+                                           primitive.com, primitive.physics))
             # states[primitive.id] = {
             #     "type": primitive.type,
             #     "pos": pos,

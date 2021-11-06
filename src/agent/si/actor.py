@@ -15,11 +15,12 @@ sys.path.append(str(ws_root))
 
 from utils.functions import print_flush, log_flush, error_handler_with_log, explained_variance_score
 from utils.variables import data_host, log_port, replay_port
+from utils.classes import ObjState
 from memory.labelled import LabelledMemory
 
 from agent.si.base import BaseOfflineAgent
 from env.fetch_gym import FetchPushEnv
-from random_sim.domain_randomization import ObjectRandomizer
+from simulation.domain_randomization import ObjectRandomizer
 from models.exploration import ExplorationPolicy
 
 
@@ -100,7 +101,7 @@ class SIActor(BaseOfflineAgent):
 
             prm_types, prm_argss = self.sim_randomizer.sample(num_objects=self.num_objects)
             obs, info = self.env.reset(prm_types=prm_types, prm_argss=prm_argss, mode='quick')
-            obj_state = info['obj_state']
+            obj_state = ObjState(info['obj_state'])
 
             if obs is None:
                 log_flush(self.log_txt, 'Environment reset failed. Wasting episode')
@@ -112,7 +113,7 @@ class SIActor(BaseOfflineAgent):
             obs_seq, reward, succeed, info1 = self.env.step(self.policy.next_action(info['obj_state']))
             self.steps += 1
             if succeed:
-                self.update_memory(obs_seq, obj_state.serialize())
+                self.update_memory(obs_seq, obj_state.to_cmaes())
                 print_flush(f'[actor.py ]Episode succeed, recording data with {obs_seq.shape} obs channels')
             else:
                 print_flush('[actor.py ]Episode failed, not recording data')

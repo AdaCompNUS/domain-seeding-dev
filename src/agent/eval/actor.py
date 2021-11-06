@@ -12,10 +12,11 @@ sys.path.append(str(ws_root))
 from models.si_model import ISModel
 from models.exploration import ExplorationPolicy
 from models.cmaes import CMA_ES
-from utils.classes import ParameterizedPolicy, ObjState
+from utils.classes import ParameterizedPolicy, ObjState, PType, PPos, POrientation, PScale, PCom, PPhysics
 from utils.variables import LOGGING_MIN, LOGGING_INFO, LOGGING_DEBUG
 from utils.functions import print_flush
-from random_sim.domain_randomization import PrimitiveRandomizer
+from simulation.domain_randomization import PrimitiveRandomizer
+from env.fetch_gym import FetchPushEnv
 
 
 LOAD_PATH = ws_root / 'trained_models'
@@ -44,12 +45,13 @@ class EvalActor:
         get the observation sequence"""
         _, info = self.real_env.reset(reset_env=False, reset_object=True, reset_robot=True,
                                    reset_goal=False, mode='quick')
-        obj_state = info['obj_state']
+        obj_state = ObjState(info['obj_state'])
         obs_seq, reward, succeed, info1 = self.real_env.step(self.exp_pi.next_action(obj_state))
 
         """Query the system identification model to guess the model parameters"""
         inputs = torch.FloatTensor(obs_seq).unsqueeze(0)
-        param_pred = PrimitiveRandomizer.mean_params(obj_state.type)
+        param_pred = PrimitiveRandomizer.mean_cemas_params(obj_state.type)
+        self.logging_level(f'Start from param {param_pred}', LOGGING_MIN)
         param_diff = self.si(inputs, param_pred).cpu().detach().squeeze(0)
         while ObjState.norm(param_diff) > 1e-2:
             # the model gives directions to update the reference
@@ -57,10 +59,34 @@ class EvalActor:
             param_pred = [ref_x + diff_x for (ref_x, diff_x) in zip(param_pred, param_diff)]
             param_diff = self.si(inputs, param_pred).cpu().detach().squeeze(0)
 
+        """Reset the environment to initial state
+        In reality, this can be different from the previous starting state"""
+        _, info = self.real_env.reset(reset_env=False, reset_object=True, reset_robot=True,
+                                      reset_goal=False, mode='quick')
+        obj_state = ObjState(info['obj_state'])
+
         """Construct a new simulation according to the model parameters"""
-        sim_env = None
+        sim_env = FetchPushEnv(gui=False)
+        p_args = {}
+        p_type = obj_state.type
+        p_args['pos'] = PPos(obj_state.pos, p_type)
+        p_args['rot'] = POrientation.from_quaternion(obj_state.quaternion, p_type)
+        p_args['scale'], p_args['com'], p_args['phy'] = PrimitiveRandomizer.refract_cemas_params(param_pred, p_type)
+        obs, info = sim_env.reset(prm_types=[p_type], prm_argss=[p_args], mode='quick')
 
         """Policy search using CMA-ES"""
         init_policy = ExplorationPolicy()
         policy = CMA_ES(env=sim_env, policy_class=ParameterizedPolicy, pop_size=50, end_iter=50,
-                        init_x=init_policy.next_action(info['obj_state']).serialize(), logging_level=LOGGING_MIN)
+                        init_x=init_policy.next_action(info['obj_state']).to_cmaes(), logging_level=LOGGING_MIN)
+
+        ret = policy.search()
+
+        """Policy execution in the actual environment"""
+        print('Resetting env')
+        self.real_env.logging_level = LOGGING_DEBUG
+        # input()
+        while True:
+            _, _ = self.real_env.reset(reset_env=False, reset_object=True, reset_robot=True, reset_goal=False, mode='normal')
+            print('Conducting best policy')
+            self.real_env.step(action=ParameterizedPolicy(x=ret))
+            input()
